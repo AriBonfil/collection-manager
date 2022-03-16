@@ -1,5 +1,5 @@
 import { IOClients } from '@vtex/api';
-import { Collections } from './Collections';
+import Collections from './Collections';
 
 
 
