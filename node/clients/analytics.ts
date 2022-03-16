@@ -1,10 +1,8 @@
-import type { InstanceOptions, IOContext, IOResponse } from '@vtex/api';
-import { ExternalClient } from '@vtex/api'
+//node/clients/analytics.ts
+import { AppClient, InstanceOptions, IOContext } from '@vtex/api'
 import { headers } from '../utils/headers'
 
-
-export default class Collections extends ExternalClient {
-
+export default class Analytics extends AppClient {
   constructor(context: IOContext, options?: InstanceOptions) {
       super(`http://${context.account}.vtexcommercestable.com.br`,
       context,
@@ -18,10 +16,12 @@ export default class Collections extends ExternalClient {
         },
       }
     )
-
   }
-  public async getCollections(): Promise<IOResponse<any>> {
-    return this.http.get('https://arcencohogareasy.myvtex.com.br/api/catalog_system/pvt/collection/search?page=1&pageSize=20&orderByAsc=true',);
+
+  public getLiveUsers(): String {
+
+    return "oso panda"
   }
 }
+
 

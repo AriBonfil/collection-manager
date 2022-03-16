@@ -1,29 +1,42 @@
 import { method, RecorderState, Service, ServiceContext } from '@vtex/api';
 
-
 import { Clients } from './clients';
-import { getCollectionsController } from './controllers/Collections';
+import { getCollections } from './handlers/collections';
+import { test } from './handlers/analytics'
 
 
 declare global {
-	type Context = ServiceContext<Clients, State>;
+  // We declare a global Context type just to avoid re-writing ServiceContext<Clients, State> in every handler and resolver
+  type Context = ServiceContext<Clients, State>
 
-	interface State extends RecorderState {
-		email: string;
-		newData: Record<string, any>;
-	}
+  // The shape of our State object found in `ctx.state`. This is used as state bag to communicate between middlewares.
+  interface State extends RecorderState {
+    code: number
+  }
 }
 
 export default new Service({
+  graphql: {
+    resolvers: {
+      Query: {
+        helloworld: () => `Service number: ${Math.random()}`,
+      },
+    },
+  },
 	clients: {
 		implementation: Clients,
 		options: {
+      getCollections:{
 
+      }
 		},
 	},
 	routes: {
 		collections: method({
-			GET: [getCollectionsController],
+			GET: [getCollections],
+		}),
+    test: method({
+			GET: [test],
 		}),
 	},
 });

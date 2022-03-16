@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "api": "^4.2.0",
     "co-body": "^6.0.0",
     "react-apollo": "^3.1.5"
   },
