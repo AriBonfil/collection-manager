@@ -19,8 +19,11 @@ export default class Analytics extends AppClient {
   }
 
   public getLiveUsers(): String {
-
-    return "oso panda"
+ /*    let ret : any = {}
+    Axios.get('/api/catalog_system/pvt/collection/search')
+    .then(r => r)
+    .then(j => ret = j) */
+    return "asd"
   }
 }
 
