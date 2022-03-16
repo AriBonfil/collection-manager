@@ -43,6 +43,6 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "api": "^4.2.0"
+
   }
 }

@@ -18,12 +18,8 @@ export default class Analytics extends AppClient {
     )
   }
 
-  public getLiveUsers(): String {
- /*    let ret : any = {}
-    Axios.get('/api/catalog_system/pvt/collection/search')
-    .then(r => r)
-    .then(j => ret = j) */
-    return "asd"
+  public async getLiveUsers(): Promise<any> {
+    return await this.http.get('/api/catalog_system/pvt/collection/search');
   }
 }
 
