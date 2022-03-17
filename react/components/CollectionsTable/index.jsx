@@ -2,7 +2,6 @@ import React from 'react'
 import { useQuery } from 'react-apollo'
 
 const CollectionsTable = () => {
-  const { data } = useQuery(helloworld)
 
   fetch('/_v/collections')
     .then(response => response.json())
