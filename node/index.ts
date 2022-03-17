@@ -2,7 +2,6 @@ import { method, RecorderState, Service, ServiceContext } from '@vtex/api';
 
 import { Clients } from './clients';
 import { getCollections } from './handlers/collections';
-import { test } from './handlers/analytics'
 
 
 declare global {
@@ -19,24 +18,18 @@ export default new Service({
   graphql: {
     resolvers: {
       Query: {
-        helloworld: () => `Service number: ${Math.random()}`,
+
       },
     },
   },
 	clients: {
 		implementation: Clients,
 		options: {
-      getCollections:{
-
-      }
 		},
 	},
 	routes: {
 		collections: method({
 			GET: [getCollections],
-		}),
-    test: method({
-			GET: [test],
-		}),
+		})
 	},
 });
