@@ -1,3 +1,4 @@
 {
-  "extends": "vtex-react/io"
+  "extends": "vtex-react/io",
+  "parser": "@babel/eslint-parser"
 }
