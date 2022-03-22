@@ -17,8 +17,8 @@ export default class Collection extends ExternalClient {
   }
 
 
-  public async getActiveCollections(page: Number, pageSize: Number): Promise<any> {
-    return await this.http.get(`/api/catalog_system/pvt/collection/search?page=${page}&pageSize=${pageSize}`);
+  public async getCollections(query: any, pageSize: Number): Promise<any> {
+    return await this.http.get(`/api/catalog_system/pvt/collection/search?page=${query.page}&pageSize=${pageSize}&orderByAsc=true`);
   }
   public async getInactiveCollections(): Promise<any> {
     return await this.http.get('/api/catalog/pvt/collection/inactive');

@@ -1,19 +1,17 @@
- import { ICollection } from '../interfaces';
-const PAGE_SIZE : Number = 50
+import { ICollectionsResponse, ICollection, IPagination } from '../interfaces';
+ const PAGE_SIZE : Number = 50
 export async function getCollections(ctx: Context, next: () => Promise<any>) {
   const {
-    clients: { collection },
+    clients: {  collection  },
+    query
   } = ctx
 
-  let data : Array<ICollection> = []
+let data : ICollectionsResponse = {};
   try {
-    let res = await collection.getActiveCollections(1, PAGE_SIZE)
-    let inactiveCollections = await collection.getInactiveCollections()
-    let reqIterations = res?.paging?.pages
-   for (let i = 0; i < reqIterations; i++) {
-
-    let res = await collection.getActiveCollections(i+1, 50)
+   let res = await collection.getCollections(query, PAGE_SIZE)
+  let inactiveCollections = await collection.getInactiveCollections()
     if(res?.items){
+      let arrItems : Array<ICollection> = []
       res.items.forEach((item: any) => {
         let itemToAdd : ICollection = {
           id: item.id,
@@ -28,11 +26,21 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
           lastModifiedBy: item.lastModifiedBy,
           active: isCollectionActive(inactiveCollections, item.id)
         }
-        data.push(itemToAdd)
+        arrItems.push(itemToAdd)
+        data = {...data, data: arrItems}
       });
     }
+    if(res?.paging){
+      console.log("entra acaa")
+      let pagination : IPagination = {
+        page: res.paging.page,
+        perPage: res.paging.perPage,
+        total: res.paging.total,
+        pages: res.paging.pages
+      }
+      data = {...data, pagination}
     }
-    ctx.body = JSON.stringify(data)
+    ctx.body =  JSON.stringify(data)
     ctx.status = 200
     ctx.set('cache-control', 'no-cache')
     await next()

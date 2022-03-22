@@ -15,3 +15,13 @@ export interface ICollection {
   lastModifiedBy: any
   active: boolean
 }
+export interface IPagination {
+  page: Number,
+  perPage: Number,
+  total: Number,
+  pages: Number
+}
+export interface ICollectionsResponse {
+  data?: Array<ICollection>,
+  pagination?: IPagination
+}
