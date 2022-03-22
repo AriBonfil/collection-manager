@@ -5,8 +5,11 @@ const Table = () => {
   const {data, tableKeys, searchParams, paginationProps } = useContext(CollectionManagerContext)
 
   const getDataIntoElementByIndex = (indexOfElement) => {
-    if (indexOfElement && data) {
+    console.log("index of element", indexOfElement);
+    if (indexOfElement >= 0 && data) {
+      console.log("datta en la func", data[0]);
       let elements = Object.entries(data[indexOfElement])
+      console.log("elements", elements);
       const getParsedValue = (value) => {
         if (value) {
           if (typeof (value) === 'string' || typeof (value) === 'number') {
@@ -25,6 +28,7 @@ const Table = () => {
     }
   }
   const filterByParams = () => {
+    console.log("dataxd", data);
     return data
   }
 

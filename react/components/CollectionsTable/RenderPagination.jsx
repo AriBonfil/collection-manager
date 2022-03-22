@@ -5,7 +5,6 @@ import './rc-pagination.css'
 import { CollectionManagerContext } from '../../context'
 const RenderPagination = () => {
 const { paginationProps, setpaginationProps, setSearchParams, searchParams } = useContext(CollectionManagerContext);
-  console.log("HOLA??: ", searchParams, paginationProps );
  const onChange = page => {
   setSearchParams({
     actualPage: page
