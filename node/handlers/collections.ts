@@ -1,17 +1,21 @@
 import { ICollectionsResponse, ICollection, IPagination } from '../interfaces';
- const PAGE_SIZE : Number = 50
+ const PAGE_SIZE : number = 50
 export async function getCollections(ctx: Context, next: () => Promise<any>) {
   const {
     clients: {  collection  },
     query
   } = ctx
 
-let data : ICollectionsResponse = {};
+
   try {
-   let res = await collection.getCollections(query, PAGE_SIZE)
+  let res = await collection.getCollections(1, PAGE_SIZE)
   let inactiveCollections = await collection.getInactiveCollections()
+  let reqIterations = res?.paging?.pages
+  let data : ICollectionsResponse = {}
+  let arrItems : Array<ICollection> = []
+  for (let i = 0; i < reqIterations; i++) {
+    let res = await collection.getCollections(i+1, PAGE_SIZE)
     if(res?.items){
-      let arrItems : Array<ICollection> = []
       res.items.forEach((item: any) => {
         let itemToAdd : ICollection = {
           id: item.id,
@@ -27,19 +31,26 @@ let data : ICollectionsResponse = {};
           active: isCollectionActive(inactiveCollections, item.id)
         }
         arrItems.push(itemToAdd)
-        data = {...data, data: arrItems}
+        data = {...data, items: arrItems}
       });
     }
+    }
     if(res?.paging){
-      console.log("entra acaa")
+
       let pagination : IPagination = {
-        page: res.paging.page,
         perPage: res.paging.perPage,
         total: res.paging.total,
         pages: res.paging.pages
       }
       data = {...data, pagination}
     }
+    //Filters:
+
+    if(query.active)
+    {
+      data = await filterByActive(data, query)
+    }
+
     ctx.body =  JSON.stringify(data)
     ctx.status = 200
     ctx.set('cache-control', 'no-cache')
@@ -58,3 +69,25 @@ let data : ICollectionsResponse = {};
   }
     return isActive
 }
+
+async function filterByActive(data: ICollectionsResponse, query: any){
+  // Available filters: active
+  if(query.active && data && data.items)
+  {
+    let newData : ICollectionsResponse = {}
+    let active: boolean = query.active === 'true' ? true : false
+    let filteredItems = data.items?.filter(i => i.active === active)
+    let newPagination : IPagination = {
+      perPage: PAGE_SIZE,
+      total: filteredItems.length,
+      pages: Math.ceil((filteredItems.length) / PAGE_SIZE)
+    }
+
+    newData = {...newData, items: filteredItems, pagination: newPagination}
+
+    return newData
+  }
+  return {}
+}
+
+

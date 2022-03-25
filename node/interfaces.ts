@@ -16,12 +16,11 @@ export interface ICollection {
   active: boolean
 }
 export interface IPagination {
-  page: Number,
   perPage: Number,
   total: Number,
   pages: Number
 }
 export interface ICollectionsResponse {
-  data?: Array<ICollection>,
+  items?: Array<ICollection>,
   pagination?: IPagination
 }

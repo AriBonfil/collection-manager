@@ -1,14 +1,13 @@
-import React from 'react'
-import { useContext } from 'react';
+import React, { useContext, useState } from 'react'
 import { CollectionManagerContext } from '../../context';
 const Table = () => {
-  const {data, tableKeys, searchParams, paginationProps } = useContext(CollectionManagerContext)
-
+  const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPage } = useContext(CollectionManagerContext)
+/*   const [checked, setchecked] = useState(false) */
   const getDataIntoElementByIndex = (indexOfElement) => {
     console.log("index of element", indexOfElement);
-    if (indexOfElement >= 0 && data) {
+    if (indexOfElement >= 0 && data[actualPage]) {
       console.log("datta en la func", data[0]);
-      let elements = Object.entries(data[indexOfElement])
+      let elements = Object.entries(data[actualPage][indexOfElement])
       console.log("elements", elements);
       const getParsedValue = (value) => {
         if (value) {
@@ -27,13 +26,20 @@ const Table = () => {
       return elements.map((value, index) => <td>{getParsedValue(value[1])}</td>)
     }
   }
-  const filterByParams = () => {
-    console.log("dataxd", data);
-    return data
-  }
 
+/*   const handleChange = () => {
+    setSearchParams({...searchParams, active: !checked})
+    setchecked(!checked);
+  }; */
   return (
     <>
+     {/*  <label>
+        <input type="checkbox"
+        checked={checked}
+        onChange={handleChange}
+        />
+        Active
+      </label> */}
     <table>
      <thead>
         <tr>
@@ -42,7 +48,7 @@ const Table = () => {
       </thead>
       <tbody>
 
-        {data && Object.entries(filterByParams(data)).map((_, index) => <tr>{getDataIntoElementByIndex(index)}</tr>)}
+        {data && Object.entries(data[actualPage]).map((_, index) => <tr>{getDataIntoElementByIndex(index)}</tr>)}
       </tbody>
     </table>
   </>

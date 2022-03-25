@@ -6,25 +6,29 @@ export const CollectionManagerProvider = ({children}) => {
   const [data, setData] = useState({})
   const [tableKeys, setTableKeys] = useState([])
   const [searchParams, setSearchParams] = useState({
-    actualPage: 1
+
   })
+  const [actualPage, setactualPage] = useState(1)
   const [paginationProps, setpaginationProps] = useState({})
 
 
   useEffect(() => {
-    fetch(`/_v/collections?page=${searchParams.actualPage}`)
+    let queryString = Object.keys(searchParams).map(key => key + '=' + searchParams[key]).join('&');
+    fetch(`/_v/collections?${queryString}`)
       .then(res => res.json())
       .then(resJson => {
+        if(resJson) {
         setData(resJson.data)
         console.log("resjson", resJson);
         setpaginationProps({
-          total: resJson.pagination.total,
-          show: resJson.data.length > 0 ? true : false,
-          pageSize: resJson.pagination.perPage
+          total: resJson.pagination?.total,
+          show: resJson.data?.length > 0 ? true : false,
+          pageSize: resJson.pagination?.perPage
         })
-        setTableKeys(Object.keys(resJson.data[0]))
+        resJson.data && setTableKeys(Object.keys(resJson.data[0]))
+      }
       })
-      .catch(err => console.error(err));
+      .catch(console.error('Algo fallo en el request al servicio'));
   }, [searchParams])
 
 
