@@ -2,13 +2,10 @@ import React, { useContext, useState } from 'react'
 import { CollectionManagerContext } from '../../context';
 const Table = () => {
   const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPage } = useContext(CollectionManagerContext)
-/*   const [checked, setchecked] = useState(false) */
+ const [checked, setchecked] = useState(false)
   const getDataIntoElementByIndex = (indexOfElement) => {
     console.log("index of element", indexOfElement);
-    if (indexOfElement >= 0 && data[actualPage]) {
-      console.log("datta en la func", data[0]);
-      let elements = Object.entries(data[actualPage][indexOfElement])
-      console.log("elements", elements);
+    if (indexOfElement >= 0 && data[actualPage - 1]) {
       const getParsedValue = (value) => {
         if (value) {
           if (typeof (value) === 'string' || typeof (value) === 'number') {
@@ -23,23 +20,26 @@ const Table = () => {
         }
 
       }
-      return elements.map((value, index) => <td>{getParsedValue(value[1])}</td>)
+      let item = data[actualPage - 1][indexOfElement]
+      return Object.entries(item).map((value, index) => <td>{getParsedValue(value[1])}</td>)
     }
   }
 
-/*   const handleChange = () => {
+  const handleChange = () => {
     setSearchParams({...searchParams, active: !checked})
     setchecked(!checked);
-  }; */
+  };
+
   return (
     <>
-     {/*  <label>
+       <label>
         <input type="checkbox"
         checked={checked}
         onChange={handleChange}
         />
-        Active
-      </label> */}
+        Mostrar solo Activas/Inactivas
+      </label>
+      {!searchParams.active ? <p>Mostrando solo inactivas</p> : <p>mostrando solo activas</p>}
     <table>
      <thead>
         <tr>
@@ -48,7 +48,7 @@ const Table = () => {
       </thead>
       <tbody>
 
-        {data && Object.entries(data[actualPage]).map((_, index) => <tr>{getDataIntoElementByIndex(index)}</tr>)}
+        {data && data[actualPage - 1] && data[actualPage - 1].map((_, index) => <tr>{getDataIntoElementByIndex(index)}</tr>)}
       </tbody>
     </table>
   </>

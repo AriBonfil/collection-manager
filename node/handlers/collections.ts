@@ -50,7 +50,7 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
     {
       data = await filterByActive(data, query)
     }
-
+    console.log("data body: ", data)
     ctx.body =  JSON.stringify(data)
     ctx.status = 200
     ctx.set('cache-control', 'no-cache')
@@ -61,7 +61,7 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
 
 }
 
- function isCollectionActive(inactiveCollections: Array<any>, collectionId: String): boolean{
+function isCollectionActive(inactiveCollections: Array<any>, collectionId: String): boolean{
   let isActive: boolean = false
   if(inactiveCollections){
   let matchingCollection = inactiveCollections.find((c: String) => c === collectionId)
@@ -76,14 +76,14 @@ async function filterByActive(data: ICollectionsResponse, query: any){
   {
     let newData : ICollectionsResponse = {}
     let active: boolean = query.active === 'true' ? true : false
-    let filteredItems = data.items?.filter(i => i.active === active)
+    let filteredItems = data.items.filter(i => i.active === active)
     let newPagination : IPagination = {
       perPage: PAGE_SIZE,
       total: filteredItems.length,
       pages: Math.ceil((filteredItems.length) / PAGE_SIZE)
     }
 
-    newData = {...newData, items: filteredItems, pagination: newPagination}
+    newData = {...data, items: filteredItems, pagination: newPagination}
 
     return newData
   }
