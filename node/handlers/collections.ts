@@ -45,12 +45,11 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
       data = {...data, pagination}
     }
     //Filters:
-
-    if(query.active)
+    if(query.get)
     {
       data = await filterByActive(data, query)
     }
-    console.log("data body: ", data)
+
     ctx.body =  JSON.stringify(data)
     ctx.status = 200
     ctx.set('cache-control', 'no-cache')
@@ -72,11 +71,24 @@ function isCollectionActive(inactiveCollections: Array<any>, collectionId: Strin
 
 async function filterByActive(data: ICollectionsResponse, query: any){
   // Available filters: active
-  if(query.active && data && data.items)
+  if(query.get && data && data.items)
   {
-    let newData : ICollectionsResponse = {}
-    let active: boolean = query.active === 'true' ? true : false
-    let filteredItems = data.items.filter(i => i.active === active)
+  let newData : ICollectionsResponse = {}
+  let filteredItems: Array<ICollection> = []
+  switch (query.get) {
+  case 'active':
+    filteredItems = data.items.filter(i => i.active === true)
+  break;
+
+  case 'inactive':
+    filteredItems = data.items.filter(i => i.active === false)
+  break;
+  case 'all':
+    filteredItems = data.items
+  break;
+  default:
+  break;
+  }
     let newPagination : IPagination = {
       perPage: PAGE_SIZE,
       total: filteredItems.length,

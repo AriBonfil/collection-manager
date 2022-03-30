@@ -10,6 +10,7 @@
     "docs": "0.x",
     "admin": "0.x",
     "node": "6.x",
+    "styles": "2.x",
     "graphql": "1.x"
   },
   "dependencies": {

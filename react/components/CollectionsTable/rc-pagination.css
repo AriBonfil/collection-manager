@@ -1,4 +1,5 @@
 @charset "UTF-8";
+
 :global(.vtex-search-result-3-x-buttonShowMore button) {
   visibility: hidden;
 }

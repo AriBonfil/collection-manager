@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { CollectionManagerContext } from '../../context';
+
 const Table = () => {
-  const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPage } = useContext(CollectionManagerContext)
- const [checked, setchecked] = useState(false)
+const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPage } = useContext(CollectionManagerContext)
   const getDataIntoElementByIndex = (indexOfElement) => {
-    console.log("index of element", indexOfElement);
     if (indexOfElement >= 0 && data[actualPage - 1]) {
       const getParsedValue = (value) => {
         if (value) {
@@ -21,25 +20,12 @@ const Table = () => {
 
       }
       let item = data[actualPage - 1][indexOfElement]
-      return Object.entries(item).map((value, index) => <td>{getParsedValue(value[1])}</td>)
+      return Object.entries(item).map((value, index) => <td key={index}>{getParsedValue(value[1])}</td>)
     }
   }
 
-  const handleChange = () => {
-    setSearchParams({...searchParams, active: !checked})
-    setchecked(!checked);
-  };
-
   return (
     <>
-       <label>
-        <input type="checkbox"
-        checked={checked}
-        onChange={handleChange}
-        />
-        Mostrar solo Activas/Inactivas
-      </label>
-      {!searchParams.active ? <p>Mostrando solo inactivas</p> : <p>mostrando solo activas</p>}
     <table>
      <thead>
         <tr>

@@ -1,6 +1,6 @@
 {
   "admin/test": "test",
   "store/test": "test",
-  "admin-example.navigation.label": "Collection Manager"
+  "admin-example.navigation.label": "Collection Manager,"
 
 }

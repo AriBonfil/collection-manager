@@ -8,9 +8,6 @@ const { paginationProps, setpaginationProps, setSearchParams, searchParams, seta
  const onChange = page => {
   setactualPage(page)
   };
-  useEffect(() => {
-    console.log("para su canto");
-  }, [])
 
   return (
     <>
