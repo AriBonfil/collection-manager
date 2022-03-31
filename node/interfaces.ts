@@ -24,3 +24,10 @@ export interface ICollectionsResponse {
   items?: Array<ICollection>,
   pagination?: IPagination
 }
+export interface ICollectionResponse {
+  collection?: ICollection,
+  products?: Array<IProduct>
+}
+export interface IProduct {
+
+}

@@ -1,21 +1,19 @@
 import React, { useContext } from 'react'
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-import { CollectionManagerProvider}  from './context'
-import CollectionTable from './components/CollectionsTable'
+import CollectionDetail from './components/CollectionsDetail'
 
-const IndexManager = () => {
-
+const IndexDetail = ({
+  params,
+}) => {
   return (
 
  <React.Fragment>
  <CssBaseline />
  <Container sx={{mt: 5}}>
-  <CollectionManagerProvider>
-    <CollectionTable/>
-  </CollectionManagerProvider>
+    <CollectionDetail id={params.id}/>
  </Container>
 </React.Fragment>
   )
 }
-export default IndexManager
+export default IndexDetail

@@ -1,6 +1,11 @@
 {
-    "admin.app.example": {
+    "admin.app.index": {
       "component": "IndexManager",
       "path": "/admin/app/collection-manager"
+    },
+    "admin.app.detail": {
+      "component": "IndexDetail",
+      "path": "/admin/app/collection-manager/detail/:id"
     }
+
   }

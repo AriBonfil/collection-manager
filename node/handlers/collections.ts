@@ -31,10 +31,11 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
           active: isCollectionActive(inactiveCollections, item.id)
         }
         arrItems.push(itemToAdd)
-        data = {...data, items: arrItems}
+
       });
     }
     }
+    data = {...data, items: arrItems}
     if(res?.paging){
 
       let pagination : IPagination = {
