@@ -1,7 +1,6 @@
 import React from 'react'
 
 const CollectionInfo = ({data}) => {
-  console.log("data", data)
   return (
     <>
     {data && <div>

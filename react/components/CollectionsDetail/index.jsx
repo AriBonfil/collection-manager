@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import CollectionInfo from './components/CollectionInfo'
+import CollectionProducts from './components/CollectionProducts'
 const index = ({id}) => {
   const [data, setData] = useState({})
   useEffect(() => {
@@ -16,6 +17,7 @@ const index = ({id}) => {
     <>{data ?
     <div>
       <CollectionInfo data={data.collection}/>
+      <CollectionProducts data={data.products}/>
     </div>
     : <div>Loading...</div>}
     </>
