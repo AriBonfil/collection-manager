@@ -1,5 +1,5 @@
 {
-    "section": "orders",
-    "titleId": "admin-example.navigation.label",
-    "path": "/admin/collection-manager"
-  }
+  "section": "storeSetup",
+  "titleId": "admin-example.navigation.label",
+  "path": "/admin/collection-manager"
+}

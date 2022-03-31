@@ -1,9 +1,9 @@
 {
-  "vendor": "arcencohogareasy",
+  "vendor": "arcencohogarqa",
   "name": "collection-manager",
   "version": "0.0.0",
-  "title": "Admin Sandbox",
-  "description": "Admin Sandbox",
+  "title": "collection-manager",
+  "description": "collection-manager",
   "builders": {
     "react": "3.x",
     "messages": "1.x",
@@ -16,9 +16,7 @@
   "dependencies": {
     "vtex.styleguide": "9.x"
   },
-  "registries": [
-    "smartcheckout"
-  ],
+  "registries": ["smartcheckout"],
   "policies": [
     {
       "name": "outbound-access",
