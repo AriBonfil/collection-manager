@@ -1,5 +1,5 @@
 {
-  "vendor": "arcencohogarqa",
+  "vendor": "arcencohogareasy",
   "name": "collection-manager",
   "version": "0.0.0",
   "title": "collection-manager",
@@ -16,7 +16,9 @@
   "dependencies": {
     "vtex.styleguide": "9.x"
   },
-  "registries": ["smartcheckout"],
+  "registries": [
+    "smartcheckout"
+  ],
   "policies": [
     {
       "name": "outbound-access",

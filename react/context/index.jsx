@@ -7,8 +7,11 @@ export const CollectionManagerProvider = ({children}) => {
   const [searchParams, setSearchParams] = useState({
     get: 'all'
   })
+  const [selectedItems, setSelectedItems] = useState([])
+  const [editMode, setEditMode] = useState(false)
   const [actualPage, setactualPage] = useState(1)
   const [paginationProps, setpaginationProps] = useState({})
+
   useEffect(() => {
     let queryString = Object.keys(searchParams).map(key => key + '=' + searchParams[key]).join('&');
     fetch(`/_v/collections?${queryString}`)
@@ -18,6 +21,7 @@ export const CollectionManagerProvider = ({children}) => {
         let dataToSet = getChunkedArrayByPagination(resJson.items, resJson.pagination)
         setData(dataToSet)
         setactualPage(1)
+        setSelectedItems([])
         setpaginationProps({
           total: resJson.pagination?.total,
           show: resJson.data?.length > 0 ? true : false,
@@ -41,7 +45,9 @@ export const CollectionManagerProvider = ({children}) => {
     }
     return res;
   }
-
+  const isCollectionSelected = (id) => {
+   return selectedItems.find(i => i === id)
+  }
   let control =
   {
     data,
@@ -51,7 +57,12 @@ export const CollectionManagerProvider = ({children}) => {
     searchParams,
     setSearchParams,
     actualPage,
-    setactualPage
+    setactualPage,
+    editMode,
+    setEditMode,
+    selectedItems,
+    setSelectedItems,
+    isCollectionSelected
   }
 
 
