@@ -40,7 +40,7 @@ const { searchParams, setSearchParams } = useContext(CollectionManagerContext);
 
   return (
     <>
-    <Box sx={{ minWidth: 120 }}>
+    <Box sx={{ minWidth: 120,  width: 'auto' }}>
     <FormControl fullWidth>
       <InputLabel id="demo-simple-select-label">Active/Inactive</InputLabel>
       <Select

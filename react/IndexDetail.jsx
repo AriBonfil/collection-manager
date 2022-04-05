@@ -1,16 +1,16 @@
 import React, { useContext } from 'react'
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
 import CollectionDetail from './components/CollectionsDetail'
-
+import styled from 'styled-components'
 const IndexDetail = ({
   params,
 }) => {
+  const Container = styled.div`
+  background-color: lightgray;
+`
   return (
 
  <React.Fragment>
- <CssBaseline />
- <Container sx={{mt: 5}}>
+ <Container>
     <CollectionDetail id={params.id}/>
  </Container>
 </React.Fragment>

@@ -17,6 +17,7 @@ export const CollectionManagerProvider = ({children}) => {
         if(resJson) {
         let dataToSet = getChunkedArrayByPagination(resJson.items, resJson.pagination)
         setData(dataToSet)
+        setactualPage(1)
         setpaginationProps({
           total: resJson.pagination?.total,
           show: resJson.data?.length > 0 ? true : false,

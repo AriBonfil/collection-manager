@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import CollectionInfo from './components/CollectionInfo'
 import CollectionProducts from './components/CollectionProducts'
+import styled from 'styled-components';
 const index = ({id}) => {
   const [data, setData] = useState({})
   useEffect(() => {
@@ -13,12 +14,19 @@ const index = ({id}) => {
     .catch(err => console.log("error al req", err));
   }, [])
 
+  const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  `
+
   return (
     <>{data ?
-    <div>
+    <Container>
       <CollectionInfo data={data.collection}/>
       <CollectionProducts data={data.products}/>
-    </div>
+    </Container>
     : <div>Loading...</div>}
     </>
 

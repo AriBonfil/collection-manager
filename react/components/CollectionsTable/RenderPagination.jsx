@@ -6,6 +6,7 @@ import { CollectionManagerContext } from '../../context'
 const RenderPagination = () => {
 const { paginationProps, setpaginationProps, setSearchParams, searchParams, setactualPage, actualPage } = useContext(CollectionManagerContext);
  const onChange = page => {
+
   setactualPage(page)
   };
 
