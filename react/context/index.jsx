@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 export const CollectionManagerContext = React.createContext();
-const ITEMS_PER_PAGE = 50
 export const CollectionManagerProvider = ({children}) => {
 
   const [data, setData] = useState({})
@@ -10,7 +9,6 @@ export const CollectionManagerProvider = ({children}) => {
   })
   const [actualPage, setactualPage] = useState(1)
   const [paginationProps, setpaginationProps] = useState({})
-
   useEffect(() => {
     let queryString = Object.keys(searchParams).map(key => key + '=' + searchParams[key]).join('&');
     fetch(`/_v/collections?${queryString}`)
@@ -19,6 +17,7 @@ export const CollectionManagerProvider = ({children}) => {
         if(resJson) {
         let dataToSet = getChunkedArrayByPagination(resJson.items, resJson.pagination)
         setData(dataToSet)
+        setactualPage(1)
         setpaginationProps({
           total: resJson.pagination?.total,
           show: resJson.data?.length > 0 ? true : false,

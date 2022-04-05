@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { CollectionManagerContext } from '../../context';
-
+import './Table.css'
 const Table = () => {
 const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPage } = useContext(CollectionManagerContext)
   const getDataIntoElementByIndex = (indexOfElement) => {
@@ -23,10 +23,15 @@ const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPa
       return Object.entries(item).map((value, index) => <td key={index}>{getParsedValue(value[1])}</td>)
     }
   }
-
+  const handleItemClick = (data) => {
+    console.log("data", data)
+    if (window.location && data.id) {
+      location.href = `${window.location.href}/detail/${data.id}`
+    }
+  }
   return (
     <>
-    <table>
+    <table className="collectionTable">
      <thead>
         <tr>
           {tableKeys.map((item, index) => <td>{item}</td>)}
@@ -34,7 +39,7 @@ const {data, tableKeys, searchParams, setSearchParams, paginationProps, actualPa
       </thead>
       <tbody>
 
-        {data && data[actualPage - 1] && data[actualPage - 1].map((_, index) => <tr>{getDataIntoElementByIndex(index)}</tr>)}
+        {data && data[actualPage - 1] && data[actualPage - 1].map((data, index) => <tr onClick={() => handleItemClick(data)}>{getDataIntoElementByIndex(index)}</tr>)}
       </tbody>
     </table>
   </>

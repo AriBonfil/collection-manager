@@ -23,5 +23,12 @@ export default class Collection extends ExternalClient {
   public async getInactiveCollections(): Promise<any> {
     return await this.http.get('/api/catalog/pvt/collection/inactive');
   }
-
+  public async getCollection(id: String): Promise<any> {
+      var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
+      return await this.http.get(`/api/catalog/pvt/collection/${id}`, config);
+  }
+  public async getCollectionProducts(id: String, page: Number): Promise<any> {
+    var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
+    return await this.http.get(`api/catalog/pvt/collection/${id}/products?page=${page}`, config);
+}
 }

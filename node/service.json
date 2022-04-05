@@ -8,6 +8,10 @@
 		"collections": {
 			"path": "/_v/collections",
 			"public": true
+		},
+    "collectionsDetail": {
+			"path": "/_v/collections/:id",
+			"public": true
 		}
 	}
 }
