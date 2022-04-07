@@ -31,4 +31,8 @@ export default class Collection extends ExternalClient {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.get(`api/catalog/pvt/collection/${id}/products?page=${page}`, config);
 }
+  public async deleteCollection(id: String): Promise<any> {
+    var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
+    return await this.http.delete(`api/catalog/pvt/collection/${id}`, config);
+  }
 }

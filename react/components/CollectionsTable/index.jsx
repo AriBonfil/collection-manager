@@ -16,17 +16,17 @@ justify-content: space-around;
 `
 
   return (
-    <>
+    <div className="xdd">
     <TopBar>
       <Filters/>
       <EditButton/>
-      <SelectedActions/>
       <SelectAllButton/>
       <ClearAllButton/>
     </TopBar>
       <Table/>
       <RenderPagination/>
-    </>
+      <SelectedActions/>
+    </div>
   )
 
 
