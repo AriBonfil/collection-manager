@@ -11,7 +11,6 @@ const ActiveInactiveFilter = () => {
 const [selected, setSelected] = useState()
 const { searchParams, setSearchParams } = useContext(CollectionManagerContext);
    const handleChange = (event) => {
-    console.log("event.target.value: ", event.target.value)
     switch (event.target.value) {
       case 'active':
       setSearchParams({

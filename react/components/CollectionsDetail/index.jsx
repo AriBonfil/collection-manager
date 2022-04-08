@@ -8,7 +8,6 @@ const index = ({id}) => {
     fetch(`/_v/collections/${id}`)
     .then(res => res.json())
     .then(resJson => {
-      console.log(resJson);
       setData(resJson)
     })
     .catch(err => console.log("error al req", err));

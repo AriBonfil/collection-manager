@@ -7,12 +7,14 @@ export const CollectionManagerProvider = ({children}) => {
   const [searchParams, setSearchParams] = useState({
     get: 'all',
   })
+  const [refresh, setRefresh] = useState(1)
   const [selectedItems, setSelectedItems] = useState([])
   const [editMode, setEditMode] = useState(false)
   const [actualPage, setactualPage] = useState(1)
   const [paginationProps, setpaginationProps] = useState({})
 
   useEffect(() => {
+    
     let queryString = Object.keys(searchParams).map(key => key + '=' + searchParams[key]).join('&');
     fetch(`/_v/collections?${queryString}`)
       .then(res => res.json())
@@ -33,8 +35,7 @@ export const CollectionManagerProvider = ({children}) => {
       }
       })
       .catch(err => console.log("error al req", err));
-      console.log("asdasd", searchParams)
-  }, [searchParams])
+  }, [searchParams, refresh])
 
   const getChunkedArrayByPagination = (items, pagination) => {
     let chunkSize = pagination.perPage
@@ -49,7 +50,7 @@ export const CollectionManagerProvider = ({children}) => {
    return selectedItems.find(i => i === id)
   }
   const refreshData = () => {
-  setSearchParams({...searchParams, refreshRandomValues : Math.random()})
+  setRefresh(Math.random())
   }
   let control =
   {

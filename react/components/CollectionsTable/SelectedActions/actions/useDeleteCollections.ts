@@ -34,6 +34,7 @@ export default async function useDeleteCollections(arrIds: Array<string>) {
           })
         })
         .catch((err) => {
+          console.log("err", err)
           itemsSuccess.push({
             id: arrIds[i],
             success: false,
@@ -45,5 +46,6 @@ export default async function useDeleteCollections(arrIds: Array<string>) {
     response.success =
       itemsSuccess.filter((item) => !item.success).length > 0 ? false : true
   }
+
   return response
 }

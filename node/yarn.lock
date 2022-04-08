@@ -164,12 +164,7 @@
   resolved "https://registry.npmjs.org/@types/mime/-/mime-1.3.2.tgz"
   integrity sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==
 
-"@types/node@*":
-  version "17.0.21"
-  resolved "https://registry.npmjs.org/@types/node/-/node-17.0.21.tgz"
-  integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
-
-"@types/node@12.x":
+"@types/node@*", "@types/node@12.x":
   version "12.20.47"
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.47.tgz"
   integrity sha512-BzcaRsnFuznzOItW1WpQrDHM7plAa7GIDMZ6b5pnMbkqEtM/6WCOhvZar39oeMQP79gwvFUWjjptE7/KGcNqFg==
@@ -194,7 +189,7 @@
 
 "@vtex/api@6.45.11-beta.0":
   version "6.45.11-beta.0"
-  resolved "https://registry.yarnpkg.com/@vtex/api/-/api-6.45.11-beta.0.tgz#e0cc33bb94302342325d0ca4a48b1d0ed662a54a"
+  resolved "https://registry.npmjs.org/@vtex/api/-/api-6.45.11-beta.0.tgz"
   integrity sha512-7l3x2atf/n8cFFMm2VzYFi3sRcb/IKD6rJUl/5s22ODzz77nFpeY8VjrVazTuSANu56Rbi7AA7dx0gCcDct8TA==
   dependencies:
     "@types/koa" "^2.11.0"
@@ -651,20 +646,13 @@ end-of-stream@^1.1.0, end-of-stream@^1.4.1:
   dependencies:
     once "^1.4.0"
 
-error@7.0.2:
+error@7.0.2, error@^7.0.0:
   version "7.0.2"
   resolved "https://registry.npmjs.org/error/-/error-7.0.2.tgz"
   integrity sha1-pfdf/02ZJhJt2sDqXcOOaJFTywI=
   dependencies:
     string-template "~0.2.1"
     xtend "~4.0.0"
-
-error@^7.0.0:
-  version "7.2.1"
-  resolved "https://registry.npmjs.org/error/-/error-7.2.1.tgz"
-  integrity sha512-fo9HBvWnx3NGUKMvMwB/CBCMMrfEJgbDTVDEkPygA3Bdd3lM1OyCd+rbQ8BwnpF6GdVeOLDNmyL4N5Bg80ZvdA==
-  dependencies:
-    string-template "~0.2.1"
 
 escape-html@^1.0.3:
   version "1.0.3"
@@ -693,7 +681,7 @@ fresh@~0.5.2:
 
 fs-capacitor@^6.2.0:
   version "6.2.0"
-  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.2.0.tgz#fa79ac6576629163cb84561995602d8999afb7f5"
+  resolved "https://registry.npmjs.org/fs-capacitor/-/fs-capacitor-6.2.0.tgz"
   integrity sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==
 
 fs-constants@^1.0.0:
@@ -759,7 +747,7 @@ graphql-tools@^4.0.6:
 
 graphql-upload@^13.0.0:
   version "13.0.0"
-  resolved "https://registry.yarnpkg.com/graphql-upload/-/graphql-upload-13.0.0.tgz#1a255b64d3cbf3c9f9171fa62a8fb0b9b59bb1d9"
+  resolved "https://registry.npmjs.org/graphql-upload/-/graphql-upload-13.0.0.tgz"
   integrity sha512-YKhx8m/uOtKu4Y1UzBFJhbBGJTlk7k4CydlUUiNrtxnwZv0WigbRHP+DVhRNKt7u7DXOtcKZeYJlGtnMXvreXA==
   dependencies:
     busboy "^0.3.1"
@@ -921,7 +909,7 @@ iterall@^1.1.3, iterall@^1.2.2:
 
 jaeger-client@^3.19.0:
   version "3.19.0"
-  resolved "https://registry.yarnpkg.com/jaeger-client/-/jaeger-client-3.19.0.tgz#9b5bd818ebd24e818616ee0f5cffe1722a53ae6e"
+  resolved "https://registry.npmjs.org/jaeger-client/-/jaeger-client-3.19.0.tgz"
   integrity sha512-M0c7cKHmdyEUtjemnJyx/y9uX16XHocL46yQvyqDlPdvAcwPDbHrIbKjQdBqtiE4apQ/9dmr+ZLJYYPGnurgpw==
   dependencies:
     node-int64 "^0.4.0"
@@ -1130,15 +1118,10 @@ mkdirp-classic@^0.5.2:
   resolved "https://registry.npmjs.org/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz"
   integrity sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==
 
-ms@2.1.2:
+ms@2.1.2, ms@^2.0.0, ms@^2.1.1:
   version "2.1.2"
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
-
-ms@^2.0.0, ms@^2.1.1:
-  version "2.1.3"
-  resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
-  integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
 negotiator@0.6.3:
   version "0.6.3"
@@ -1167,7 +1150,7 @@ object-inspect@^1.9.0:
 
 object-path@^0.11.8:
   version "0.11.8"
-  resolved "https://registry.yarnpkg.com/object-path/-/object-path-0.11.8.tgz#ed002c02bbdd0070b78a27455e8ae01fc14d4742"
+  resolved "https://registry.npmjs.org/object-path/-/object-path-0.11.8.tgz"
   integrity sha512-YJjNZrlXJFM42wTBn6zgOJVar9KFJvzx6sTWDte8sWZF//cnjl0BxHNpfZx+ZffXX63A9q0b1zsFiBX4g4X5KA==
 
 on-finished@^2.3.0:
@@ -1235,7 +1218,7 @@ process@^0.10.0:
 
 prom-client@^14.0.1:
   version "14.0.1"
-  resolved "https://registry.yarnpkg.com/prom-client/-/prom-client-14.0.1.tgz#bdd9583e02ec95429677c0e013712d42ef1f86a8"
+  resolved "https://registry.npmjs.org/prom-client/-/prom-client-14.0.1.tgz"
   integrity sha512-HxTArb6fkOntQHoRGvv4qd/BkorjliiuO2uSWC2KC17MUTKYttWdDoXX/vxOhQdkoECEM9BBH0pj2l8G8kev6w==
   dependencies:
     tdigest "^0.1.1"
@@ -1374,6 +1357,7 @@ side-channel@^1.0.4:
 "stats-lite@github:vtex/node-stats-lite#dist":
   version "2.2.0"
   resolved "https://codeload.github.com/vtex/node-stats-lite/tar.gz/1b0d39cc41ef7aaecfd541191f877887a2044797"
+  integrity sha512-3o21zgsTVLo+sv/EPMJ1ClW2ItgauDG+xXeVRMj65iJk2bVek5e9JPtIsa68rOBkz/2YC/TCIJ4KGLkbNClJ4w==
   dependencies:
     isnumber "~1.0.0"
 
