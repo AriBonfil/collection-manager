@@ -64,6 +64,7 @@ const SelectedActions = () => {
           case 'clone':
             //Pending to implement in service side
              /*  useCloneCollections(selectedItems) */
+             alert("La Clonacion de coleccciones todavia no esta disponible, en desarrollo")
             break;
           default:
             console.log("La accion no es valida", action);
