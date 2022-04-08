@@ -5,7 +5,7 @@ export const CollectionManagerProvider = ({children}) => {
   const [data, setData] = useState({})
   const [tableKeys, setTableKeys] = useState([])
   const [searchParams, setSearchParams] = useState({
-    get: 'all'
+    get: 'all',
   })
   const [selectedItems, setSelectedItems] = useState([])
   const [editMode, setEditMode] = useState(false)
@@ -48,6 +48,9 @@ export const CollectionManagerProvider = ({children}) => {
   const isCollectionSelected = (id) => {
    return selectedItems.find(i => i === id)
   }
+  const refreshData = () => {
+  setSearchParams({...searchParams, refreshRandomValues : Math.random()})
+  }
   let control =
   {
     data,
@@ -62,7 +65,8 @@ export const CollectionManagerProvider = ({children}) => {
     setEditMode,
     selectedItems,
     setSelectedItems,
-    isCollectionSelected
+    isCollectionSelected,
+    refreshData
   }
 
 

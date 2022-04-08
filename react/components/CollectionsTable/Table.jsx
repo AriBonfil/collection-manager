@@ -61,7 +61,7 @@ const Table = () => {
           {data &&
             data[actualPage - 1] &&
             data[actualPage - 1].map((data, index) => (
-              <tr style={{backgroundColor: isCollectionSelected(data.id) && editMode ? 'lightgoldenrodyellow' : '#ffff'}} onClick={() => handleItemClick(data)}>
+              <tr key={index} style={{backgroundColor: isCollectionSelected(data.id) && editMode ? 'lightgoldenrodyellow' : '#ffff'}} onClick={() => handleItemClick(data)}>
                 {getDataIntoElementByIndex(index)}
               </tr>
             ))}

@@ -1,13 +1,16 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import useDeleteCollections from './actions/useDeleteCollections'
+import useCloneCollections from './actions/useCloneCollections'
 import { CollectionManagerContext } from '../../../context'
 import styled from 'styled-components'
 import ConfirmationModal from './ConfirmationModal'
+
 const SelectedActions = () => {
-  const { selectedItems, editMode } = useContext(CollectionManagerContext)
+  const { selectedItems, editMode, refreshData } = useContext(CollectionManagerContext)
   const [showActions, setShowActions] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [action, setAction] = useState(null)
+  const [error, setError] = useState(false)
   const FixedContent = styled.div`
     position: fixed;
     bottom: 5%;
@@ -36,14 +39,49 @@ const SelectedActions = () => {
       background-color: ${props => props.backgroundColor === 'danger' ? 'red' : 'white'}
     }
   `
-    function handleItemClick (action) {
+  function handleItemClick (action) {
       setAction(action)
       setShowModal(true)
+  }
+
+  const handleModalCallback = async (userAccept) => {
+    if(userAccept)
+    {
+         switch (action) {
+          case 'delete':
+              let res = await useDeleteCollections(selectedItems)
+              if(res.success)
+              {
+                refreshData()
+                setShowModal(false)
+              }
+              else {
+                setShowModal(false)
+                setError(true)
+                alert("No se ha podido realizar la accion correctamente")
+              }
+            break;
+          case 'clone':
+            //Pending to implement in service side
+             /*  useCloneCollections(selectedItems) */
+            break;
+          default:
+            console.log("La accion no es valida", action);
+            break;
+        }
     }
+    else {
+      setShowModal(false)
+    }
+  }
+  let modalProps = {
+    action,
+    handleModalCallback
+  }
   return (
     <>
       {selectedItems.length > 0 && editMode && (
-        <FixedContent>
+        <FixedContent onClick={() => setShowActions(!showActions)}>
           {showActions && (
             <ListContainer>
               <ActionsList>
@@ -55,11 +93,13 @@ const SelectedActions = () => {
             </ListContainer>
           )}
 
-          <p onClick={() => setShowActions(!showActions)}>Acciones</p>
+          <p>Acciones</p>
         </FixedContent>
 
       )}
-      {showModal && action && <ConfirmationModal action={action}/>}
+      {error ? <div>Tu ultima accion NO se a realizado correctamente</div> : <div>Tu ultima accion se a realizado correctamente</div>}
+      {showModal && action && !error && <ConfirmationModal props={modalProps} />}
+
     </>
   )
 }

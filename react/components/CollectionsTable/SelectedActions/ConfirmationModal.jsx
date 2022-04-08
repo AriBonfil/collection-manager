@@ -1,49 +1,37 @@
 import React, {useContext, useState} from 'react'
-import useDeleteCollections from './actions/useDeleteCollections'
+
 import { CollectionManagerContext } from '../../../context'
 import styled from 'styled-components'
-const ConfirmationModal = ({action}) => {
+const ConfirmationModal = ({props}) => {
   const {
     selectedItems,
-
+    editMode
   } = useContext(CollectionManagerContext)
   const [loading, setLoading] = useState(false)
   const ModalContainer = styled.div`
     position: fixed;
+    top: 50%;
     left: 50%;
-    bottom: 50%;
+    transform: translate(-50%, -50%);
     background-color: white;
     border-radius: 16px;
     border: 1px solid black;
     padding: 1rem;
   `
-  const handleConfirmation = async () => {
-    setLoading(true)
-    switch (action) {
-      case 'delete':
-          await useDeleteCollections(selectedItems)
-          setLoading(false)
-        break;
-       /*  case 'clone':
-          useCloneCollections(selectedItems)
-        break; */
-      default:
-        break;
-    }
-  }
   return (
     <>
-
-
-    {
-    action && !loading &&
+     {
+    props.action && !loading && editMode &&
     <ModalContainer>
       <p>Estas segurx de la accion que queres realizar?</p>
-      <p>La accion {action} se ejecutara sobre los siguientes IDs:</p>
-      {selectedItems.map(i => (<p key={i}>{i}</p>))}
-      <button onClick={() => handleConfirmation(action)}>Si, estoy segurx</button>
+      <p>La accion {props.action} se ejecutara sobre los siguientes IDs:</p>
+      <ul>
+      {selectedItems.map(i => (<li key={i}>{i}</li>))}
+      </ul>
+      <button onClick={() => props.handleModalCallback(true)}>Si, estoy segurx</button>
+      <button onClick={() => props.handleModalCallback(false)}>Cancelar</button>
       </ModalContainer>
-      }
+    }
       {loading && <ModalContainer>Cargando</ModalContainer>}
     </>
   )
