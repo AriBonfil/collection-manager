@@ -16,6 +16,10 @@
     "deleteCollection": {
       "path": "/_v/collections/delete/:id",
       "public": true
+    },
+    "cloneCollection": {
+      "path": "/_v/collections/clone/:id",
+      "public": true
     }
 	}
 }

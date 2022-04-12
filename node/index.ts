@@ -4,6 +4,7 @@ import { Clients } from './clients';
 import { getCollections } from './handlers/collections';
 import { getCollection } from './handlers/collection';
 import { deleteCollection } from './handlers/deleteCollection'
+import { cloneCollection } from './handlers/cloneCollection'
 declare global {
   // We declare a global Context type just to avoid re-writing ServiceContext<Clients, State> in every handler and resolver
   type Context = ServiceContext<Clients, State>
@@ -36,6 +37,9 @@ export default new Service({
 		}),
     deleteCollection: method({
       POST: [deleteCollection],
+    }),
+    cloneCollection: method({
+      POST: [cloneCollection],
     })
 	},
 });

@@ -1,9 +1,9 @@
-import {ISuccessItem, IUseDeleteCollectionResponse } from './interfaces'
+import {ISuccessItem, IUseCloneCollectionResponse } from './interfaces'
 
-export default async function useDeleteCollections(arrIds: Array<string>) {
+export default async function useCloneCollections(arrIds: Array<string>) {
   let itemsSuccess: Array<ISuccessItem> = []
 
-  let response: IUseDeleteCollectionResponse = {
+  let response: IUseCloneCollectionResponse = {
     success: false,
     itemsSuccess,
   }
@@ -18,7 +18,7 @@ export default async function useDeleteCollections(arrIds: Array<string>) {
     }
 
     for (let i = 0; i < arrIds.length; i++) {
-      fetch(`/_v/collections/delete/${arrIds[i]}`, options)
+      fetch(`/_v/collections/clone/${arrIds[i]}`, options)
         .then((r) => r.json())
         .then(() => {
           itemsSuccess.push({

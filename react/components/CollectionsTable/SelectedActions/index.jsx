@@ -63,7 +63,7 @@ const SelectedActions = () => {
             break;
           case 'clone':
             //Pending to implement in service side
-             /*  useCloneCollections(selectedItems) */
+             useCloneCollections(selectedItems)
              alert("La Clonacion de coleccciones todavia no esta disponible, en desarrollo")
             break;
           default:
