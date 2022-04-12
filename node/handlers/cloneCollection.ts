@@ -5,12 +5,15 @@ export async function cloneCollection(ctx: Context, next: () => Promise<any>) {
   } = ctx
 try{
   const id : String = ctx.url.split("/")[ctx.url.split("/").length-1]
-  let res = await collection.getCollection(id)
-  ctx.body = {
-    ok: true,
-    res
+  let getCollectionRes = await collection.getCollection(id)
+  if(getCollectionRes.ok) {
+    let cloneCollectionRes = await collection.cloneCollection(getCollectionRes.res)
+    ctx.body = {
+      ok: true,
+    }
   }
-  ctx.status = res.status
+
+  ctx.status = 200
   ctx.set('cache-control', 'no-cache')
   await next()
 } catch (error) {

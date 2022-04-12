@@ -15,6 +15,18 @@ export interface ICollection {
   lastModifiedBy: any
   active: boolean
 }
+export interface ICollectionNative {
+  id: Number,
+  name: String,
+  searchable: boolean,
+  highlight: true,
+  dateFrom: String,
+  dateTo: String,
+  totalSku: Number,
+  totalProducts: Number,
+  type: String,
+  lastModifiedBy: any
+}
 export interface IPagination {
   perPage: Number,
   total: Number,

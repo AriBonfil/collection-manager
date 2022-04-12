@@ -1,5 +1,6 @@
 import type { InstanceOptions, IOContext } from '@vtex/api'
 import { ExternalClient } from '@vtex/api'
+import { ICollectionNative } from '../interfaces';
 
 export default class Collection extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
@@ -34,5 +35,9 @@ export default class Collection extends ExternalClient {
   public async deleteCollection(id: String): Promise<any> {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.delete(`api/catalog/pvt/collection/${id}`, config);
+  }
+  public async cloneCollection(collection: ICollectionNative): Promise<any> {
+    var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
+    return await this.http.delete(`api/catalog/pvt/collection`, config);
   }
 }
