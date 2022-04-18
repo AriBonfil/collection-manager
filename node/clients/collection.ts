@@ -37,7 +37,10 @@ export default class Collection extends ExternalClient {
     return await this.http.delete(`api/catalog/pvt/collection/${id}`, config);
   }
   public async cloneCollection(collection: ICollectionNative): Promise<any> {
-    var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
-    return await this.http.delete(`api/catalog/pvt/collection`, config);
+    var config = {
+      body: JSON.stringify({collection}),
+      headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}
+    };
+    return await this.http.post(`api/catalog/pvt/collection`, config);
   }
 }

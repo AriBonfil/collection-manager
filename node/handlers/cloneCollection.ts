@@ -7,11 +7,21 @@ try{
   const id : String = ctx.url.split("/")[ctx.url.split("/").length-1]
   let getCollectionRes = await collection.getCollection(id)
   if(getCollectionRes.ok) {
-    let cloneCollectionRes = await collection.cloneCollection(getCollectionRes.res)
-    ctx.body = {
-      ok: true,
-    }
+    console.log('getcolectionres', getCollectionRes)
+   /*  let newCollectionData = {
+  Name: String,
+  Description: String,
+  Searchable: boolean,
+  Highlight: boolean,
+  DateFrom: String,
+  DateTo: String
+    } */
+    /* let cloneCollectionRes = await collection.cloneCollection(getCollectionRes.res) */
+   /*  ctx.body = {
+      cloneCollectionRes
+    } */
   }
+
 
   ctx.status = 200
   ctx.set('cache-control', 'no-cache')
