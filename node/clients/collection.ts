@@ -38,9 +38,17 @@ export default class Collection extends ExternalClient {
   }
   public async cloneCollection(collection: ICollectionNative): Promise<any> {
     var config = {
-      body: JSON.stringify({collection}),
+      Name: collection.name,
+      Description: collection.description,
+      Searchable: collection.searchable,
+      Highlight: collection.highlight,
+      DateFrom: collection.dateFrom,
+      DateTo: collection.dateTo,
+      mode: 'no-cors',
       headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}
     };
-    return await this.http.post(`api/catalog/pvt/collection`, config);
+    return await this.http.post('api/catalog/pvt/collection', config);
   }
+
+  /* public async addProductToCollection()  ....a desarrollar... */
 }

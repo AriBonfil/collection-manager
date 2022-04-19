@@ -16,12 +16,12 @@ export interface ICollection {
   active: boolean
 }
 export interface ICollectionNative {
-  Name: String,
-  Description: String,
-  Searchable: boolean,
-  Highlight: boolean,
-  DateFrom: String,
-  DateTo: String
+  name: String,
+  description: String,
+  searchable: boolean,
+  highlight: boolean,
+  dateFrom: String,
+  dateTo: String
 }
 export interface IPagination {
   perPage: Number,
