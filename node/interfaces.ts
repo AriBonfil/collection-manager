@@ -39,3 +39,20 @@ export interface ICollectionResponse {
 export interface IProduct {
 
 }
+export interface ICollectionsProductsResponse {
+    Data:      ICollectionsProductItemResponse[];
+    Page:      number;
+    Size:      number;
+    TotalPage: number;
+    TotalRows: number;
+}
+
+export interface ICollectionsProductItemResponse {
+    Position:        number;
+    ProductId:       number;
+    ProductName:     string;
+    SkuId:           number;
+    SkuImageUrl:     null | string;
+    SubCollectionId: number;
+}
+

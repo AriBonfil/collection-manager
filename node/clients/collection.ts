@@ -1,6 +1,8 @@
-import type { InstanceOptions, IOContext } from '@vtex/api'
+import type { InstanceOptions, IOContext, RequestConfig } from '@vtex/api'
 import { ExternalClient } from '@vtex/api'
-import { ICollectionNative } from '../interfaces';
+import { ICollectionNative, ICollectionsProductItemResponse, ICollectionsProductsResponse } from '../interfaces';
+import FormData from 'form-data'
+import XLSX from "xlsx";
 
 export default class Collection extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
@@ -28,26 +30,93 @@ export default class Collection extends ExternalClient {
       var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
       return await this.http.get(`/api/catalog/pvt/collection/${id}`, config);
   }
-  public async getCollectionProducts(id: String, page: Number): Promise<any> {
+  public async CreateCollection(values: ICollectionNative): Promise<any>  {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
-    return await this.http.get(`api/catalog/pvt/collection/${id}/products?page=${page}`, config);
-}
+    return await this.http.post('api/catalog/pvt/collection', JSON.stringify(values), config);
+  }
+  public async getCollectionProducts(id: String, page: Number) {
+    var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
+    return await this.http.get<ICollectionsProductsResponse>(`api/catalog/pvt/collection/${id}/products?page=${page}&pageSize=50`, config);
+  }
   public async deleteCollection(id: String): Promise<any> {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.delete(`api/catalog/pvt/collection/${id}`, config);
   }
-  public async cloneCollection(collection: ICollectionNative): Promise<any> {
-    var config = {
-      Name: collection.name,
-      Description: collection.description,
-      Searchable: collection.searchable,
-      Highlight: collection.highlight,
-      DateFrom: collection.dateFrom,
-      DateTo: collection.dateTo,
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}
+
+
+  public async *getCollectionProductsYield(id: String) {
+    const collectionProducts = await this.getCollectionProducts(id, 1)
+    for (let i = 0; i < collectionProducts?.TotalPage;i++) {
+      let res = await this.getCollectionProducts(id, i+1)
+      if(res?.Data)  yield res.Data;
+    }
+  }
+
+  public async AddProductsInCollection(id: Number, Ids: {sku?: number, product?: number}[]) {
+    const data = [
+      ["SKU", "PRODUCTID", "SKUREFID", "PRODUCTREFID"],
+      ...Ids.map(({product, sku})=>([sku,product,,]))
+    ];
+		const ws = XLSX.utils.aoa_to_sheet(data);
+
+		const wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws);
+    const wbrite = XLSX.write(wb, {bookType:"xls", type:"buffer"});
+
+    for (let index = 0; index < 5; index++) {
+      const formData = new FormData()
+
+      formData.append('file', wbrite, "file.xls")
+
+      const config:RequestConfig = {
+        headers: {
+          'Access-Control-Allow-Origin' : '*',
+          'Content-Type': `multipart/form-data; charset=utf-8; boundary="${formData.getBoundary()}"`,
+          "knownLength": 1
+        }
+      };
+      const result = await this.http.post<{
+        TotalItemProcessed: number,
+        TotalErrorsProcessed: number,
+        TotalProductsProcessed: number,
+        Errors: any[]
+      }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
+      if(result.TotalProductsProcessed > 0) return result;
+    }
+    throw new Error(`Algo fallo al agregar productos a la collection ${id}`);
+  }
+
+  public async cloneCollection(id: string): Promise<any> {
+    const origin = await this.getCollection(id);
+    const newCollecion = await this.CreateCollection({
+      name: origin.Name + " (clone)",
+      description: origin.Description,
+      searchable: origin.Searchable,
+      highlight: origin.Highlight,
+      dateFrom: origin.DateFrom,
+      dateTo: origin.DateTo
+    });
+    const iteratorProducts = this.getCollectionProductsYield(id);
+    while (true) {
+      let finish = false;
+      let delayProducts: ICollectionsProductItemResponse[] = [];
+      for (let index = 0; delayProducts.length < 400; index++) {
+        const {value: products, done} = await iteratorProducts.next();
+        if(done){
+          finish = true;
+          break;
+        }
+        if(Array.isArray(products)) delayProducts.push(...products);
+      }
+      await this.AddProductsInCollection(newCollecion.Id, delayProducts.map(p=> ({product: p.ProductId, sku: p.SkuId})));
+      delayProducts = [];
+      if(finish) break;
+    }
+
+    return {
+      ...await this.getCollection(newCollecion.Id.toString()),
+      origin
     };
-    return await this.http.post('api/catalog/pvt/collection', config);
   }
 
   /* public async addProductToCollection()  ....a desarrollar... */
