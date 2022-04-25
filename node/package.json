@@ -10,7 +10,8 @@
     "@types/node": "12.x",
     "@vtex/api": "6.45.10",
     "@vtex/tsconfig": "^0.5.6",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.146.1/public/@types/vtex.styleguide"
   },
   "scripts": {
     "lint": "tsc --noEmit --pretty && eslint -c .eslintrc.json --fix './**/*.ts'"

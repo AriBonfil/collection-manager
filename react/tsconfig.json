@@ -7,5 +7,13 @@
     "moduleResolution": "node",
     "target": "es2017"
   },
-  "include": ["./typings/*.d.ts", "./**/*.tsx", "./**/*.ts", "CollectionManagerContext.js", "components/CollectionsTable/index.tsx", "index.jsx", "components/CollectionsTable/SelectedActions/actions/useDeleteCollections.ts"]
+  "include": [
+    "./typings/*.d.ts",
+    "./**/*.tsx",
+    "./**/*.ts",
+    "CollectionManagerContext.js",
+    "components/CollectionsTable/index.tsx",
+    "index.jsx",
+    "components/CollectionsTable/SelectedActions/actions/useDeleteCollections.ts"
+  ]
 }
