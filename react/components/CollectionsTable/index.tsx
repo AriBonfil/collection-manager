@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import Table from './Table'
 import RenderPagination from './RenderPagination'
-import { CollectionManagerContext } from '../../context'
 import Filters from './Filters'
 import EditButton from './EditButton'
 import ClearAllButton from './ClearAllButton'
@@ -17,12 +16,12 @@ justify-content: space-around;
 
   return (
     <div className="xdd">
-    <TopBar>
-      <Filters/>
-      <EditButton/>
-      <SelectAllButton/>
-      <ClearAllButton/>
-    </TopBar>
+      <TopBar>
+        <Filters/>
+        <EditButton/>
+        <SelectAllButton/>
+        <ClearAllButton/>
+      </TopBar>
       <Table/>
       <RenderPagination/>
       <SelectedActions/>

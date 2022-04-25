@@ -1,7 +1,6 @@
-import React, { useContext, useState } from 'react'
-import { CollectionManagerContext } from '../../context'
+import React from 'react'
+import { useCollectionManager } from '../../context'
 import './Table.css'
-import styled from 'styled-components'
 
 const Table = () => {
   const {
@@ -12,11 +11,11 @@ const Table = () => {
     setSelectedItems,
     actualPage,
     isCollectionSelected
-  } = useContext(CollectionManagerContext)
+  } = useCollectionManager();
 
-  const getDataIntoElementByIndex = (indexOfElement) => {
+  const getDataIntoElementByIndex = (indexOfElement:number) => {
     if (indexOfElement >= 0 && data[actualPage - 1]) {
-      const getParsedValue = (value) => {
+      const getParsedValue = (value: string | number) => {
         if (value) {
           if (typeof value === 'string' || typeof value === 'number') {
             return value.toString()
@@ -26,33 +25,36 @@ const Table = () => {
             return ''
           }
         }
+        return undefined;
       }
       let item = data[actualPage - 1][indexOfElement]
       return Object.entries(item).map((value, index) => (
         <td key={index}>{getParsedValue(value[1])}</td>
       ))
     }
+    return undefined;
   }
-  const handleItemClick = (data) => {
+  const handleItemClick = (d: (typeof data)[0][0]) => {
     if (!editMode) {
-      if (window.location && data.id) {
-        location.href = `${window.location.href}/detail/${data.id}`
+      if (window.location && d.id) {
+        location.href = `${window.location.href}/detail/${d.id}`
       }
     } else {
-      if (!isCollectionSelected(data.id)) {
-        setSelectedItems([...selectedItems, data.id])
+      if (!isCollectionSelected(d.id)) {
+        setSelectedItems([...selectedItems, d.id])
       } else {
-        setSelectedItems(selectedItems.filter((i) => i !== data.id))
+        setSelectedItems(selectedItems.filter((i) => i !== d.id))
       }
     }
   }
 
   return (
     <>
+    AWFWAF
       <table className="collectionTable">
         <thead>
           <tr>
-            {tableKeys.map((item, index) => (
+            {tableKeys.map((item) => (
               <td>{item}</td>
             ))}
           </tr>

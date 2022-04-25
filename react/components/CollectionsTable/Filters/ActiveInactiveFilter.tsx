@@ -1,17 +1,17 @@
-import React, {useState, useContext} from 'react'
-import { CollectionManagerContext } from '../../../context'
+import React, {useState} from 'react'
+import { useCollectionManager } from '../../../context'
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 
 
 const ActiveInactiveFilter = () => {
-const [selected, setSelected] = useState()
-const { searchParams, setSearchParams } = useContext(CollectionManagerContext);
-   const handleChange = (event) => {
-    switch (event.target.value) {
+const [selected, setSelected] = useState<string>()
+const { searchParams, setSearchParams } = useCollectionManager();
+   const handleChange = (value:string) => {
+    switch (value) {
       case 'active':
       setSearchParams({
         ...searchParams,
@@ -33,7 +33,7 @@ const { searchParams, setSearchParams } = useContext(CollectionManagerContext);
       default:
         break;
     }
-    setSelected(event.target.value)
+    setSelected(value)
 
   };
 
@@ -47,7 +47,7 @@ const { searchParams, setSearchParams } = useContext(CollectionManagerContext);
         id="demo-simple-select"
         value={selected}
         label="Active/Inactive"
-        onChange={handleChange}
+        onChange={(v)=> handleChange(v.target.value)}
       >
         <MenuItem value='active'>Solo Activas</MenuItem>
         <MenuItem value='inactive'>Solo Inactivas</MenuItem>

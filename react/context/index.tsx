@@ -1,20 +1,27 @@
-import React, {useState, useEffect} from "react";
-export const CollectionManagerContext = React.createContext();
-export const CollectionManagerProvider = ({children}) => {
+import React, {useState, useEffect, useContext} from "react";
 
-  const [data, setData] = useState({})
-  const [tableKeys, setTableKeys] = useState([])
-  const [searchParams, setSearchParams] = useState({
+const CONTEXT = React.createContext<CollectionManagerType>({} as any);
+export type CollectionManagerType = ReturnType<typeof BUILD>;
+const BUILD = ()=>{
+  const [data, setData] = useState<{
+    id: string
+  }[][]>([])
+  //# ANY #
+  const [tableKeys, setTableKeys] = useState<any[]>([])
+  const [searchParams, setSearchParams] = useState<{[key: string]:string}>({
     get: 'all',
   })
   const [refresh, setRefresh] = useState(1)
-  const [selectedItems, setSelectedItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [editMode, setEditMode] = useState(false)
   const [actualPage, setactualPage] = useState(1)
-  const [paginationProps, setpaginationProps] = useState({})
+  const [paginationProps, setpaginationProps] = useState<{
+    total?: number,
+    show?: boolean,
+    pageSize?: number
+  }>({})
 
   useEffect(() => {
-    
     let queryString = Object.keys(searchParams).map(key => key + '=' + searchParams[key]).join('&');
     fetch(`/_v/collections?${queryString}`)
       .then(res => res.json())
@@ -37,7 +44,8 @@ export const CollectionManagerProvider = ({children}) => {
       .catch(err => console.log("error al req", err));
   }, [searchParams, refresh])
 
-  const getChunkedArrayByPagination = (items, pagination) => {
+  //# ANY #
+  const getChunkedArrayByPagination = (items:any[], pagination:any) => {
     let chunkSize = pagination.perPage
     const res = [];
     for (let i = 0; i < items.length; i += chunkSize) {
@@ -46,14 +54,15 @@ export const CollectionManagerProvider = ({children}) => {
     }
     return res;
   }
-  const isCollectionSelected = (id) => {
-   return selectedItems.find(i => i === id)
+  const isCollectionSelected = (id:string) => {
+    return selectedItems.find(i => i === id)
   }
+
   const refreshData = () => {
-  setRefresh(Math.random())
+    setRefresh(Math.random())
   }
-  let control =
-  {
+
+  return {
     data,
     paginationProps,
     setpaginationProps,
@@ -69,12 +78,17 @@ export const CollectionManagerProvider = ({children}) => {
     isCollectionSelected,
     refreshData
   }
+}
 
-
+export const CollectionManagerProvider:React.FC<{}> = ({children}) => {
+  const control = BUILD();
   return (
-    <CollectionManagerContext.Provider value={control}>
-  {children}
-    </CollectionManagerContext.Provider>
+    <CONTEXT.Provider value={control}>
+      {children}
+    </CONTEXT.Provider>
   );
 }
 
+export const useCollectionManager = ()=>{
+  return useContext(CONTEXT);
+}

@@ -1,13 +1,14 @@
-import React, {useContext, useState} from 'react'
+import React, { useState} from 'react'
 
-import { CollectionManagerContext } from '../../../context'
+import { useCollectionManager } from '../../../context'
 import styled from 'styled-components'
-const ConfirmationModal = ({props}) => {
+//# ANY #
+const ConfirmationModal:React.FC<{props: any}> = ({props}) => {
   const {
     selectedItems,
     editMode
-  } = useContext(CollectionManagerContext)
-  const [loading, setLoading] = useState(false)
+  } = useCollectionManager();
+  const [loading] = useState(false)
   const ModalContainer = styled.div`
     position: fixed;
     top: 50%;

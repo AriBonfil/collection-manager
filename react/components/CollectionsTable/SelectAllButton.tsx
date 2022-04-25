@@ -1,13 +1,13 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { CollectionManagerContext } from '../../context';
+import { useCollectionManager } from '../../context';
 const SelectAllButton = () => {
-const {editMode, selectedItems, setSelectedItems, data} = useContext(CollectionManagerContext)
+const {editMode, setSelectedItems, data} = useCollectionManager();
   const ButtonSelectAll = styled.button`
   border-radius: 4px;
   background-color: white;
   border-color: lightgray
-  `
+  `;
   const selectAllCollections = () => {
     if(data){
       let newArr = []

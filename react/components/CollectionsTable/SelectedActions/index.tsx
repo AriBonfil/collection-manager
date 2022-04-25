@@ -1,15 +1,16 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState } from 'react'
 import useDeleteCollections from './actions/useDeleteCollections'
 import useCloneCollections from './actions/useCloneCollections'
-import { CollectionManagerContext } from '../../../context'
+import { useCollectionManager } from '../../../context'
 import styled from 'styled-components'
 import ConfirmationModal from './ConfirmationModal'
 
 const SelectedActions = () => {
-  const { selectedItems, editMode, refreshData } = useContext(CollectionManagerContext)
+  //# ANY #
+  const { selectedItems, editMode, refreshData } = useCollectionManager();
   const [showActions, setShowActions] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [action, setAction] = useState(null)
+  const [action, setAction] = useState<'delete' | 'clone' | undefined>()
   const [error, setError] = useState(false)
   const FixedContent = styled.div`
     position: fixed;
@@ -29,7 +30,7 @@ const SelectedActions = () => {
   `
   const ListContainer = styled.div``
 
-  const ListItem = styled.li`
+  const ListItem = styled.li<{backgroundColor?: string}>`
     padding: 5px;
     margin: 5px;
     border-radius: 10px;
@@ -39,12 +40,13 @@ const SelectedActions = () => {
       background-color: ${props => props.backgroundColor === 'danger' ? 'red' : 'white'}
     }
   `
-  function handleItemClick (action) {
+  function handleItemClick (action:Parameters<typeof setAction>[0]) {
       setAction(action)
       setShowModal(true)
   }
 
-  const handleModalCallback = async (userAccept) => {
+  //# ANY #
+  const handleModalCallback = async (userAccept:any) => {
     if(userAccept)
     {
          switch (action) {
@@ -79,6 +81,7 @@ const SelectedActions = () => {
     action,
     handleModalCallback
   }
+
   return (
     <>
       {selectedItems.length > 0 && editMode && (

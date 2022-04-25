@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react'
 import CollectionInfo from './components/CollectionInfo'
 import CollectionProducts from './components/CollectionProducts'
 import styled from 'styled-components';
-const index = ({id}) => {
-  const [data, setData] = useState({})
+const index: React.FC<{id: string}> = ({id}) => {
+  //# ANY #
+  const [data, setData] = useState<any>({})
   useEffect(() => {
     fetch(`/_v/collections/${id}`)
     .then(res => res.json())

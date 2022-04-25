@@ -1,15 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
-const CollectionInfo = ({data}) => {
+
+//# ANY #
+const CollectionInfo:React.FC<{data: any}> = ({data}) => {
   const Container = styled.div`
-  background-color: white;
-  margin: 2rem;
-  padding: 2rem;
-  border-radius: 21px;
-  width: fit-content;
-  height: fit-content;
-  font-size: larger;
-}`
+    background-color: white;
+    margin: 2rem;
+    padding: 2rem;
+    border-radius: 21px;
+    width: fit-content;
+    height: fit-content;
+    font-size: larger;
+  `;
+
   return (
     <>
     {data && <Container>
