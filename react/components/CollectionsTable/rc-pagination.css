@@ -59,6 +59,8 @@
   border-radius: 2px;
   outline: 0;
   cursor: pointer;
+  -webkit-user-select: none;
+  -ms-user-select: none;
   user-select: none;
 }
 
@@ -156,6 +158,8 @@
 :global(.rc-pagination-next button) {
   color: rgba(0, 0, 0, 0.85);
   cursor: pointer;
+  -webkit-user-select: none;
+  -ms-user-select: none;
   user-select: none;
 }
 

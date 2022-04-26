@@ -2,7 +2,7 @@ import React from 'react'
 import Pagination from 'rc-pagination'
 // @ts-ignore
 import localeInfo from 'rc-pagination/es/locale/es_ES'
-import './rc-pagination.css'
+// import './rc-pagination.css'
 import { useCollectionManager } from '../../context'
 const RenderPagination = () => {
   const {

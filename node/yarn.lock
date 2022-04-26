@@ -316,10 +316,6 @@ apollo-utilities@^1.0.1, apollo-utilities@^1.3.0:
     ts-invariant "^0.4.0"
     tslib "^1.10.0"
 
-"arcencohogarqa.collection-manager@https://devjan2--arcencohogarqa.myvtex.com/_v/private/typings/linked/v1/arcencohogarqa.collection-manager@0.0.1-0+build1650890574/public/@types/arcencohogarqa.collection-manager":
-  version "0.0.1-0"
-  resolved "https://devjan2--arcencohogarqa.myvtex.com/_v/private/typings/linked/v1/arcencohogarqa.collection-manager@0.0.1-0+build1650890574/public/@types/arcencohogarqa.collection-manager#aaaf7b6f0ac170313468159901a8e1b482ec7a26"
-
 archiver-utils@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/archiver-utils/-/archiver-utils-2.1.0.tgz"

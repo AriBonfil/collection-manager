@@ -1,6 +1,6 @@
 import {ISuccessItem, IUseCloneCollectionResponse } from './interfaces'
 
-export default async function useCloneCollections(arrIds: Array<string>) {
+export default async function useCloneCollections(arrIds: Array<number>) {
   let itemsSuccess: Array<ISuccessItem> = []
 
   let response: IUseCloneCollectionResponse = {

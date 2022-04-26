@@ -1,6 +1,6 @@
 import {ISuccessItem, IUseDeleteCollectionResponse } from './interfaces'
 
-export default async function useDeleteCollections(arrIds: Array<string>) {
+export default async function useDeleteCollections(arrIds: Array<number>) {
   let itemsSuccess: Array<ISuccessItem> = []
 
   let response: IUseDeleteCollectionResponse = {

@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import ConfirmationModal from './ConfirmationModal'
 
 const SelectedActions = () => {
-  //# ANY #
   const { selectedItems, editMode, refreshData } = useCollectionManager();
   const [showActions, setShowActions] = useState(false)
   const [showModal, setShowModal] = useState(false)

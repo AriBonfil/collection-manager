@@ -3,7 +3,7 @@ export interface IUseCloneCollectionResponse {
   itemsSuccess: Array<ISuccessItem>
 }
 export interface ISuccessItem {
-  id: string
+  id: number
   success: boolean
   error?: any
 }
