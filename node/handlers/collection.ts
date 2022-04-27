@@ -4,7 +4,6 @@ import { IProduct } from "../interfaces"
 export async function getCollection(ctx: Context, next: () => Promise<any>) {
 
 try{
-   let data : any = {}
   const {
     clients: {  collection  },
   } = ctx
@@ -31,7 +30,7 @@ try{
       });
     }
     }
-  data = {...data, collection: collectionData, products: arrProducts}
+  var data = { collection: collectionData, products: arrProducts}
   ctx.body =  JSON.stringify(data)
   ctx.status = 200
   ctx.set('cache-control', 'no-cache')

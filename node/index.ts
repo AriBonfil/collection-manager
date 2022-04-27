@@ -5,6 +5,7 @@ import { getCollections } from './handlers/collections';
 import { getCollection } from './handlers/collection';
 import { deleteCollection } from './handlers/deleteCollection'
 import { cloneCollection } from './handlers/cloneCollection'
+import { TaskManager } from './utils/tasks';
 declare global {
   // We declare a global Context type just to avoid re-writing ServiceContext<Clients, State> in every handler and resolver
   type Context = ServiceContext<Clients, State>
@@ -29,6 +30,14 @@ export default new Service({
 		},
 	},
 	routes: {
+    tasks: method({
+			GET: [async (ctx:Context)=>{
+        const actions = await TaskManager.GetTaskManager(ctx as any).getActionAll();
+        ctx.set('cache-control', 'no-cache')
+        ctx.body =  JSON.stringify(actions)
+        ctx.status = 200
+      }],
+		}),
 		collections: method({
 			GET: [getCollections],
 		}),

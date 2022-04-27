@@ -1,6 +1,6 @@
 import type { InstanceOptions, IOContext, RequestConfig } from '@vtex/api'
 import { ExternalClient } from '@vtex/api'
-import { ICollectionNative, ICollectionsProductItemResponse, ICollectionsProductsResponse } from '../interfaces';
+import { ICollectionNative, ICollectionsProductItemResponse, ICollectionsProductsResponse, ICollectionNativeUpper } from '../interfaces';
 import FormData from 'form-data'
 import XLSX from "xlsx";
 
@@ -26,7 +26,7 @@ export default class Collection extends ExternalClient {
   public async getInactiveCollections(): Promise<any> {
     return await this.http.get('/api/catalog/pvt/collection/inactive');
   }
-  public async getCollection(id: String): Promise<any> {
+  public async getCollection(id: String | number): Promise<ICollectionNativeUpper> {
       var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
       return await this.http.get(`/api/catalog/pvt/collection/${id}`, config);
   }
@@ -34,7 +34,7 @@ export default class Collection extends ExternalClient {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.post('api/catalog/pvt/collection', JSON.stringify(values), config);
   }
-  public async getCollectionProducts(id: String, page: Number) {
+  public async getCollectionProducts(id: String | number, page: Number) {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.get<ICollectionsProductsResponse>(`api/catalog/pvt/collection/${id}/products?page=${page}&pageSize=50`, config);
   }
@@ -44,11 +44,11 @@ export default class Collection extends ExternalClient {
   }
 
 
-  public async *getCollectionProductsYield(id: String) {
+  public async *getCollectionProductsYield(id: String | number) {
     const collectionProducts = await this.getCollectionProducts(id, 1)
     for (let i = 0; i < collectionProducts?.TotalPage;i++) {
       let res = await this.getCollectionProducts(id, i+1)
-      if(res?.Data)  yield res.Data;
+      if(res?.Data)  yield {items: res.Data, progreso: i/collectionProducts?.TotalPage};
     }
   }
 
@@ -86,7 +86,7 @@ export default class Collection extends ExternalClient {
     throw new Error(`Algo fallo al agregar productos a la collection ${id}`);
   }
 
-  public async cloneCollection(id: string): Promise<any> {
+  public async cloneCollection(id: string | number, progreso?: (n:number)=>void ) {
     const origin = await this.getCollection(id);
     const newCollecion = await this.CreateCollection({
       name: origin.Name + " (clone)",
@@ -101,12 +101,15 @@ export default class Collection extends ExternalClient {
       let finish = false;
       let delayProducts: ICollectionsProductItemResponse[] = [];
       for (let index = 0; delayProducts.length < 400; index++) {
-        const {value: products, done} = await iteratorProducts.next();
+        const {value, done} = await iteratorProducts.next();
         if(done){
           finish = true;
           break;
         }
-        if(Array.isArray(products)) delayProducts.push(...products);
+        if(value && Array.isArray(value.items)){
+          if(progreso) await progreso(value.progreso);
+          delayProducts.push(...value.items);
+        }
       }
       await this.AddProductsInCollection(newCollecion.Id, delayProducts.map(p=> ({product: p.ProductId, sku: p.SkuId})));
       delayProducts = [];

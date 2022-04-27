@@ -15,10 +15,10 @@ const index: React.FC<{id: string}> = ({id}) => {
   }, [])
 
   const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
   `
 
   return (

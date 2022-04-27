@@ -1,21 +1,23 @@
+import { ActionClone, TaskManager, TaskNames } from "../utils/tasks";
 
 export async function cloneCollection(ctx: Context, next: () => Promise<any>) {
-  const {
-    clients: {  collection  },
-  } = ctx
-try{
-  const id : string = ctx.url.split("/")[ctx.url.split("/").length-1]
-  const newCollection = await collection.cloneCollection(id);
+  try{
+    const id : string = ctx.url.split("/")[ctx.url.split("/").length-1];
 
-  ctx.body = JSON.stringify(newCollection);
+    const tasks = TaskManager.GetTaskManager(ctx);
+    const action = await tasks.push<ActionClone>(TaskNames.CLONE, { id });
+    tasks.run_next();
+    // const newCollection = await collection.cloneCollection(id);
 
-  ctx.status = 200
-  ctx.set('cache-control', 'no-cache')
-  await next()
-} catch (error) {
-  ctx.body = {
-    ok: false,
+    ctx.body = JSON.stringify(action);
+
+    ctx.status = 200
+    ctx.set('cache-control', 'no-cache')
+    await next()
+  } catch (error) {
+    ctx.body = {
+      ok: false,
+    }
+    console.error("error", error)
   }
-  console.error("error", error)
-}
 }

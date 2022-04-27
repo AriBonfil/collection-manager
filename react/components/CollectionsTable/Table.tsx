@@ -1,6 +1,6 @@
 import React from 'react'
 import { useCollectionManager } from '../../context'
-// import './Table.css'
+import './Table.css'
 
 import {
   EXPERIMENTAL_Table,
@@ -74,10 +74,7 @@ const columns = [
 
 function Actions({ data }:any) {
   return (
-    <div onClick={e=>{
-      e.preventDefault();
-      e.stopPropagation();
-    }}>
+    <StopEvent>
       <ActionMenu
         buttonProps={{
           variation: 'tertiary',
@@ -108,8 +105,22 @@ function Actions({ data }:any) {
           },
         ]}
       />
-    </div>
+    </StopEvent>
   )
+}
+let omitClick1:number = 0;
+const StopEvent:React.FC = ({children})=>{
+  return <div onClick={()=>{
+    omitClick1 = Date.now();
+  }} style={{
+    "width": "32px",
+    "height": "32px",
+    "justifyContent": "center",
+    "alignItems": "center",
+    "display": "flex",
+  }}>
+    {children}
+  </div>
 }
 
 //hook to handle checkboxes
@@ -123,10 +134,7 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
   (checkboxes.itemTree.children as TableType[]).forEach((item:TableType ) => {
     const id = `${item.id}`
     mapped[id] = (
-      <div onClick={e=>{
-        e.preventDefault();
-        e.stopPropagation();
-      }}>
+      <StopEvent>
         <Checkbox
           key={id}
           id={id}
@@ -135,7 +143,7 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
           disabled={checkboxes.isDisabled(item)}
           onChange={() => checkboxes.toggle(item)}
         />
-      </div>
+      </StopEvent>
     )
   })
 
@@ -143,17 +151,14 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
     {
       id: 'checkbox',
       title: (
-        <div onClick={e=>{
-          e.preventDefault();
-          e.stopPropagation();
-        }}>
+        <StopEvent>
           <Checkbox
             id={`${checkboxes.itemTree.id}`}
             checked={checkboxes.allChecked}
             partial={checkboxes.someChecked}
             onChange={checkboxes.toggleAll}
           />
-        </div>
+        </StopEvent>
       ),
       width: "32px",
       extended: true,
@@ -177,7 +182,7 @@ const Table = () => {
     }
   } = useCollectionManager();
 
-  const sliceItems:TableType[] = isLoading || !pagination?[]:items.slice(queryParams.pageSize * queryParams.page, queryParams.pageSize * (queryParams.page + 1)).map((c:ICollection)=>({
+  const sliceItems:TableType[] = isLoading || !pagination?[]:items.map((c:ICollection)=>({
     checkbox: false,
     id: c.id,
     name: c.name,
@@ -216,16 +221,38 @@ const Table = () => {
     onActionClick: (action:any) => action.onClick((checkboxes as any).checkedItems),
   }
 
+  const GoToDetalles = (id:number)=>{
+    location.href = `collection-manager/detail/${id}`
+  }
+
+
+  const inputSearch = {
+    value: queryParams.q,
+    placeholder: 'Buscar...',
+    onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
+    onClear: () => {
+      setQueryParams({q: null, page: 0})
+    },
+    onSubmit: (e:any) => {
+      e.preventDefault()
+      setQueryParams({q: null, page: 0})
+    },
+  }
+
   return (
     <>
       <EXPERIMENTAL_Table
         loading={isLoading}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
-          alert(`Clicked ${rowData.name} from ${rowData}`)
+          if(Date.now() - omitClick1 < 100 ) return;
+          GoToDetalles(rowData.id);
         }}
         items={sliceItems}
         columns={withCheckboxes}
         measures={measures}>
+          <EXPERIMENTAL_Table.Toolbar>
+            <EXPERIMENTAL_Table.Toolbar.InputSearch {...inputSearch} />
+          </EXPERIMENTAL_Table.Toolbar>
           <EXPERIMENTAL_Table.Pagination {...{
             onPrevClick: ()=> setQueryParams({page: queryParams.page - 1}),
             onNextClick: ()=> setQueryParams({page: queryParams.page + 1}),
@@ -247,16 +274,16 @@ const Table = () => {
             <EXPERIMENTAL_Table.Bulk.Tail>
               {!(checkboxes as any).allChecked && (
                 <EXPERIMENTAL_Table.Bulk.Tail.Info>
-                  All rows selected: {(checkboxes as any).checkedItems.length}
+                  Colecciones seleccionadas: {(checkboxes as any).checkedItems.length}
                 </EXPERIMENTAL_Table.Bulk.Tail.Info>
               )}
               <EXPERIMENTAL_Table.Bulk.Tail.Toggle
                 button={{
-                  text: `Select all ${items.length}`,
+                  text: `Seleccionar todas ${items.length}`,
                   onClick: (checkboxes as any).checkAll,
                 }}
                 active={(checkboxes as any).allChecked}>
-                Selected rows: {items.length}
+                Colecciones seleccionadas: {items.length}
               </EXPERIMENTAL_Table.Bulk.Tail.Toggle>
               <EXPERIMENTAL_Table.Bulk.Tail.Dismiss onClick={(checkboxes as any).uncheckAll} />
             </EXPERIMENTAL_Table.Bulk.Tail>

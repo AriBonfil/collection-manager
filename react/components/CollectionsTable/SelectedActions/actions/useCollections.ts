@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { request, useResource } from "react-request-hook";
-import { useQueryParams, NumberParam,withDefault } from "use-query-params";
+import { useQueryParams, NumberParam,withDefault, StringParam } from "use-query-params";
 
 export interface CollectionsResponse {
   items:      ICollection[];
@@ -38,6 +38,7 @@ export type useCollectionsProps = {
 export const useCollections = (params:useCollectionsProps={})=>{
   const [cound, setCound] = useState(0);
   const [queryParams, setQueryParams] = useQueryParams({
+    q:  withDefault(StringParam, null),
     page: withDefault(NumberParam, 0),
     pageSize: withDefault(NumberParam, 10),
   });
@@ -57,10 +58,12 @@ export const useCollections = (params:useCollectionsProps={})=>{
     error,
     queryParams,
     setQueryParams: (v:Parameters<typeof setQueryParams>[0])=>{
-      setQueryParams(v, "pushIn");
+      setQueryParams(v, "replaceIn");
       setCound(cound+1)
     },
-    items: data?.items,
+    items: data?.items
+      .slice(queryParams.pageSize * queryParams.page, queryParams.pageSize * (queryParams.page + 1))
+      .filter(i=> queryParams.q?i.name.toLowerCase().includes(queryParams.q.toLowerCase()):true),
     pagination: data?.pagination,
   }
 }

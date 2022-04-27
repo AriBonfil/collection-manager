@@ -5,6 +5,10 @@
 	"ttl": 300,
 	"timeout": 100,
 	"routes": {
+		"tasks": {
+			"path": "/_v/collections/tasks",
+			"public": true
+		},
 		"collections": {
 			"path": "/_v/collections",
 			"public": true

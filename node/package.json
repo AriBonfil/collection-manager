@@ -1,14 +1,16 @@
 {
   "dependencies": {
+    "@types/randomstring": "^1.1.8",
     "co-body": "^6.0.0",
     "form-data": "^4.0.0",
+    "randomstring": "^1.2.2",
     "react-apollo": "^3.1.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/co-body": "^0.0.3",
     "@types/node": "12.x",
-    "@vtex/api": "6.45.10",
+    "@vtex/api": "6.45.12",
     "@vtex/tsconfig": "^0.5.6",
     "typescript": "3.9.7",
     "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.146.1/public/@types/vtex.styleguide"

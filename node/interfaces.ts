@@ -23,6 +23,14 @@ export interface ICollectionNative {
   dateFrom: String,
   dateTo: String
 }
+export interface ICollectionNativeUpper {
+  Name: String,
+  Description: String,
+  Searchable: boolean,
+  Highlight: boolean,
+  DateFrom: String,
+  DateTo: String
+}
 export interface IPagination {
   perPage: Number,
   total: Number,

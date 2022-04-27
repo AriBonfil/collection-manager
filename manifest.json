@@ -33,6 +33,9 @@
         "host": "{{account}}.vtexcommercestable.com.br",
         "path": "/api/*"
       }
+    },
+    {
+      "name": "vbase-read-write"
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
