@@ -13,6 +13,7 @@ import {
 // import OptionsDots from 'vtex.styleguide/OptionsDots';
 
 import { ICollection } from './SelectedActions/actions/useCollections'
+import { Tasks } from './tasks'
 
 export type TableType = {
   id: number,
@@ -200,47 +201,44 @@ const Table = () => {
     items: sliceItems,
   })
 
-  const primaryAction = {
-    label: 'Eliminar',
-    onClick: () => alert("A"),
-  }
-
-  const secondaryActions = {
-    label: 'Quantity',
-    actions: [
-      {
-        label: 'Increase 50',
-        onClick: () => alert("A"),
-      },
-      {
-        label: 'Decrease 50',
-        onClick: () => alert("A"),
-        isDangerous: true
-      },
-    ],
-    onActionClick: (action:any) => action.onClick((checkboxes as any).checkedItems),
-  }
-
   const GoToDetalles = (id:number)=>{
     location.href = `collection-manager/detail/${id}`
   }
 
+  const upload = {
+    label: 'Import',
+    onClick: () => alert('Clicked IMPORT'),
+  }
 
-  const inputSearch = {
-    value: queryParams.q,
-    placeholder: 'Buscar...',
-    onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
-    onClear: () => {
-      setQueryParams({q: null, page: 0})
-    },
-    onSubmit: (e:any) => {
-      e.preventDefault()
-      setQueryParams({q: null, page: 0})
-    },
+  const density = {
+    label: 'Line density',
+    compactLabel: 'Compact',
+    regularLabel: 'Regular',
+    comfortableLabel: 'Comfortable',
+  }
+
+
+  const extraActions = {
+    label: 'More options',
+    actions: [
+      {
+        label: 'An action',
+        onClick: () => alert('An action'),
+      },
+      {
+        label: 'Another action',
+        onClick: () => alert('Another action'),
+      },
+      {
+        label: 'A third action',
+        onClick: () => alert('A third action'),
+      },
+    ],
   }
 
   return (
     <>
+      <Tasks/>
       <EXPERIMENTAL_Table
         loading={isLoading}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
@@ -251,7 +249,27 @@ const Table = () => {
         columns={withCheckboxes}
         measures={measures}>
           <EXPERIMENTAL_Table.Toolbar>
-            <EXPERIMENTAL_Table.Toolbar.InputSearch {...inputSearch} />
+            <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
+              value: queryParams.q,
+              placeholder: 'Buscar...',
+              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
+              onClear: () => {
+                setQueryParams({q: null, page: 0})
+              },
+              onSubmit: (e:any) => {
+                e.preventDefault()
+                setQueryParams({q: null, page: 0})
+              },
+            }} />
+            <EXPERIMENTAL_Table.Toolbar.ButtonGroup>
+              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Columns {...buttonColumns} /> */}
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Density {...density} />
+              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Download {...download} /> */}
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...upload} />
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.ExtraActions {...extraActions} />
+              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.NewLine {...newLine} /> */}
+            </EXPERIMENTAL_Table.Toolbar.ButtonGroup>
+            <div>AAA</div>
           </EXPERIMENTAL_Table.Toolbar>
           <EXPERIMENTAL_Table.Pagination {...{
             onPrevClick: ()=> setQueryParams({page: queryParams.page - 1}),
@@ -268,8 +286,29 @@ const Table = () => {
           }}/>
           <EXPERIMENTAL_Table.Bulk active={(checkboxes as any).someChecked}>
             <EXPERIMENTAL_Table.Bulk.Actions>
-              <EXPERIMENTAL_Table.Bulk.Actions.Primary {...primaryAction} />
-              <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...secondaryActions} />
+              <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
+                label: 'Eliminar',
+                onClick: () => alert("A"),
+              }} />
+              <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
+                label: 'Clonar',
+                onClick: () => alert("A"),
+              }} />
+              {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{
+                label: 'Quantity',
+                actions: [
+                  {
+                    label: 'Increase 50',
+                    onClick: () => alert("A"),
+                  },
+                  {
+                    label: 'Decrease 50',
+                    onClick: () => alert("A"),
+                    isDangerous: true
+                  },
+                ],
+                onActionClick: (action:any) => action.onClick((checkboxes as any).checkedItems),
+              }} /> */}
             </EXPERIMENTAL_Table.Bulk.Actions>
             <EXPERIMENTAL_Table.Bulk.Tail>
               {!(checkboxes as any).allChecked && (

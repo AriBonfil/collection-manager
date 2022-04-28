@@ -1,22 +1,22 @@
 import randomstring from "randomstring";
 
-
 export enum TaskNames {
   CLONE="clone",
   DELETE="delete"
 }
 
-enum ActionState {
+export enum ActionState {
   WAIT_FOR_RUN="wait_for_run",
   RUNING="runing",
   COMPLETE="complete",
   ERROR="error"
 }
 
-type ActionBase = {
+export type ActionBase = {
   id: string
   task: TaskNames
   createAt: number
+  editAt: number
   params?: unknown
   state: ActionState
   ms: number
@@ -26,6 +26,7 @@ type ActionBase = {
   }
   error?: any
 }
+
 
 class TaskBase{
   public constructor(public manager: TaskManager, public action: ActionBase){}
@@ -90,6 +91,7 @@ export class TaskManager{
   async updateAction(action: ActionBase){
     const actions = await this.getActionAll();
     actions[actions.findIndex(a=> a.id === action.id)] = action;
+    action.editAt = Date.now()
     await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actions);
   }
 
@@ -100,10 +102,25 @@ export class TaskManager{
     }
   }
   async push<ACTION extends ActionBase>(taskName: TaskNames, params: ACTION["params"]){
-    const actionAll = await this.getActionAll();
+    var actionAll = await this.getActionAll();
+
+    const brokeList = actionAll.filter(i=> (i.editAt || 0) + (1000 * 60 * 5) < Date.now() && i.state === ActionState.RUNING);
+    if(brokeList.length > 0){
+      for (let index = 0; index < brokeList.length; index++) {
+        const element = brokeList[index];
+        element.state = ActionState.ERROR;
+        element.error = {
+          message: "La tarea no se completo bien."
+        }
+        await this.updateAction(element);
+      }
+      actionAll = await this.getActionAll();
+    }
+
     const action: ActionBase = {
       id: randomstring.generate(10),
       createAt: Date.now(),
+      editAt: Date.now(),
       progress: {
         value: 0
       },
@@ -121,8 +138,8 @@ export class TaskManager{
   async run_next(){
     const list = await this.getActionAll();
 
-    var runing = list.find(l=> l.state === ActionState.RUNING);
-    if(runing) return;
+    var runing = list.filter(l=> l.state === ActionState.RUNING);
+    if(runing.length > 0) return;
 
     var waiting = list.find(l=> l.state === ActionState.WAIT_FOR_RUN);
     if(!waiting) return;

@@ -26,3 +26,30 @@ table tbody tr:hover {
 table tbody tr:nth-child(odd) {
   background-color: #ffffff;
 } */
+
+:global(.task-state){
+  background: #F5F5F5;
+  border-radius: 99px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.task-info){
+  font-size: 11px;
+}
+
+:global(.vtex-styleguide-9-x-progressHeight){
+  height: 0.25rem;
+}
+/* :global(.vtex-styleguide-9-x-progressHeight):global(.bg-action-primary),
+:global(.vtex-styleguide-9-x-progressHeight):global(.bg-success){
+  height: 0.2rem;
+  margin: 0.15rem;
+} */
+
+:global(.task-error) :global(.vtex-styleguide-9-x-progressHeight):global(.bg-action-primary){
+  background-color: #d1011b;
+}
