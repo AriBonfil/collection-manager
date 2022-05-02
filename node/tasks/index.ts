@@ -15,19 +15,20 @@ export enum ActionState {
   ERROR="error"
 }
 
-var taskManager:TaskManager = undefined as any;
+// var taskManager:TaskManager = undefined as any;
 
 export class TaskManager{
   static KEY_ENV = "fzCrs";
-  static KEY_LIST = "gFRnv";
+  static KEY_LIST = "2BuYv";
 
   constructor(public ctx: Context){
 
   }
 
   static GetTaskManager(ctx: Context){
-    if(!taskManager) taskManager = new TaskManager(ctx);
-    return taskManager;
+    // if(!taskManager) taskManager = new TaskManager(ctx);
+    // return taskManager;
+    return new TaskManager(ctx);
   }
 
   async getActionAll(){
@@ -80,7 +81,10 @@ export class TaskManager{
   async push<ACTION extends ActionBase>(taskName: TaskNames, params: ACTION["params"][]){
     var actionAll = await this.getActionAll();
 
-    var actions = params.map((param)=>{
+    if(actionAll.find(a=> a.state === ActionState.WAIT_FOR_RUN || a.state === ActionState.RUNING))
+      throw new Error("Existen tareas pendientes!!");
+
+    const actions = params.map((param)=>{
       const action: ActionBase = {
         id: randomstring.generate(10),
         createAt: Date.now(),
@@ -93,13 +97,13 @@ export class TaskManager{
         ms: 0,
         params: param
       };
-      actionAll.unshift(action);
-      // if(actionAll.length > 100) actionAll.pop();
       return action;
     });
-    await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actionAll);
+
+    await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actions);
     return actions;
   }
+
   async run_next(){
     const list = await this.getActionAll();
 

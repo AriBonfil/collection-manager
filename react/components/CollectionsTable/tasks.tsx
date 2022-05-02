@@ -167,12 +167,13 @@ export const useTasks = ()=>{
   const {Toast} = useTasksToast(tasks);
 
   var isStatus = null;
+  if(tasks.find(t=> t.state === ActionState.WAIT_FOR_RUN)) isStatus = "wait for run";
+  if(tasks.find(t=> t.state === ActionState.COMPLETE)) isStatus = "complete";
   if(tasks.find(t=> t.state === ActionState.ERROR)) isStatus = "error";
   if(tasks.find(t=> t.state === ActionState.RUNING)) isStatus = "running";
-  if(tasks.find(t=> t.state === ActionState.COMPLETE)) isStatus = "complete";
 
 
-   return {
+  return {
      BotonTasks: isStatus && (
       <div onClick={()=> setOpen(true)}>
         {isStatus}

@@ -84,7 +84,7 @@ export default class Collection extends ExternalClient {
         TotalProductsProcessed: number,
         Errors: any[]
       }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
-      console.log("🧊",result, Ids);
+
       if(result.TotalProductsProcessed > 0 || items.length === 0) return result;
     }
     throw new Error(`Algo fallo al agregar productos a la collection ${id}`);
