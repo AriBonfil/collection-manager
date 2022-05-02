@@ -1,7 +1,7 @@
 import React, { SVGProps, useEffect, useRef, useState } from "react";
 import { request, useResource } from "react-request-hook";
 //@ts-ignore
-import { Progress, Spinner, Tooltip  } from 'vtex.styleguide';
+import { Progress, Spinner, Tooltip, EXPERIMENTAL_Modal, ToastConsumer } from 'vtex.styleguide';
 import cn from "classnames";
 
 export enum TaskNames {
@@ -93,7 +93,7 @@ const Error = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
-const useTasks = ()=>{
+const useSyncTasks = ()=>{
   const [cound, setCound] = useState(0);
   const reload = ()=> setCound(cound+1);
 
@@ -126,43 +126,112 @@ const BuildText = (action: ActionBase)=>{
   return "Desconocido";
 }
 
-export const Tasks: React.FC<{}> = ()=>{
-  const {tasks} = useTasks();
+const useTasksToast = (tasks:ActionBase[])=>{
+  const [last, setLast] = useState<number | string>(0);
+  const ref = useRef<any>({});
 
-   return <div>
-     {tasks.map((t)=>{
-       return <div className={cn("tasks","pb5", `task-${t.state}`)} style={{maxWidth: "250px"}}>
-          <div className="flex justify-between pb3">
-            <div className="flex items-center">
-              <span className="">{BuildText(t)}</span>
-            </div>
-            <div className="flex items-center task-info">
-              {t.state===ActionState.RUNING && <>
-                <span className="mr1 gray">{((((t.editAt - t.createAt) / t.progress.value)/1000) * (1 - t.progress.value)).toFixed(0) +" s"}</span>
-                <span className="mr1 mb2 gray">.</span>
-              </>}
+  useEffect(()=>{
+    if(!tasks || tasks.length < 1) return;
+    if(tasks[0].createAt <= last) return;
+    const list = tasks.filter(t=> t.createAt > last);
+    list.forEach((t)=>{
+      ref.current?.showToast({
+        message: `Se completo la tarea "${BuildText(t)}"`,
+        duration: 1000,
+        // action: {
+        //   label: 'See cart',
+        //   href: 'http://vtex.com',
+        //   target: '_blank'
+        // }
+      });
+    });
+    setLast(tasks[0].createAt);
+  },[tasks]);
 
-              <span className="mr2 gray">{`${Math.round(t.progress.value * 100)}%`}</span>
-              <span className="task-state">
-                { t.state === ActionState.COMPLETE && <Verificado/> }
-                { t.state === ActionState.ERROR &&
-                  <Tooltip label={
-                    <div style={{overflowWrap: "anywhere"}}>
-                      <div className="pb2">{t.error.message}</div>
-                      <div className="f7">{t.error.stack}</div>
+  return {
+    Toast: (
+      <ToastConsumer>
+        {({showToast}: any) => {
+          ref.current.showToast = showToast;
+          return null;
+        }}
+      </ToastConsumer>
+    )
+  };
+}
+
+export const useTasks = ()=>{
+  const [isOpen, setOpen] = useState(false);
+  const {tasks} = useSyncTasks();
+
+  const {Toast} = useTasksToast(tasks);
+
+  var isStatus = null;
+  if(tasks.find(t=> t.state === ActionState.ERROR)) isStatus = "error";
+  if(tasks.find(t=> t.state === ActionState.RUNING)) isStatus = "running";
+  if(tasks.find(t=> t.state === ActionState.COMPLETE)) isStatus = "complete";
+
+
+   return {
+     BotonTasks: isStatus && (
+      <div onClick={()=> setOpen(true)}>
+        {isStatus}
+      </div>
+     ),
+      ModalTasks: (
+        <>
+          {Toast}
+          <EXPERIMENTAL_Modal
+            isOpen={isOpen}
+            onClose={()=> setOpen(false)}
+            size="small"
+            title="Actividad"
+          >
+            <div className={cn("tasks-list")}>
+              {tasks.map((t)=>{
+                return <div className={cn("tasks","pb5", `task-${t.state}`)} >
+                  <div className="flex justify-between pb3">
+                    <div className="flex items-center">
+                      <span className="">{BuildText(t)}</span>
                     </div>
-                  }>
-                    <span>
-                      <Error/>
-                    </span>
-                  </Tooltip>
-                }
-                { t.state === ActionState.RUNING && <Spinner size={12}/> }
-              </span>
+                    <div className="flex items-center task-info">
+                      {t.state===ActionState.RUNING && <>
+                        <span className="mr1 gray">{((((t.editAt - t.createAt) / t.progress.value)/1000) * (1 - t.progress.value)).toFixed(0) +" s"}</span>
+                        <span className="mr1 mb2 gray">.</span>
+                      </>}
+
+                      <span className="mr2 gray">{`${Math.round(t.progress.value * 100)}%`}</span>
+                      <span className="task-state">
+                        { t.state === ActionState.COMPLETE &&
+                          <Tooltip label={ t.ms<1000? `${t.ms}ms`:`${t.ms/1000}s` }>
+                            <span>
+                              <Verificado/>
+                            </span>
+                          </Tooltip>
+                          }
+                        { t.state === ActionState.ERROR &&
+                          <Tooltip label={
+                            <div style={{overflowWrap: "anywhere"}}>
+                              <div className="pb2">{t.error.message}</div>
+                              <div className="f7">{t.error.stack}</div>
+                            </div>
+                          }>
+                            <span>
+                              <Error/>
+                            </span>
+                          </Tooltip>
+                        }
+                        { t.state === ActionState.RUNING && <Spinner size={12}/> }
+                      </span>
+                    </div>
+                  </div>
+                  <Progress type="line" percent={t.progress.value * 100} danger={t.state === ActionState.ERROR}/>
+                </div>
+              })}
             </div>
-          </div>
-          <Progress type="line" percent={t.progress.value * 100} danger={t.state === ActionState.ERROR}/>
-       </div>
-     })}
-   </div>
+          </EXPERIMENTAL_Modal>
+        </>
+      )
+
+   }
 };

@@ -53,3 +53,7 @@ table tbody tr:nth-child(odd) {
 :global(.task-error) :global(.vtex-styleguide-9-x-progressHeight):global(.bg-action-primary){
   background-color: #d1011b;
 }
+
+:global(.vtex-styleguide-9-x-popup){
+  z-index: 99999999999 !important;
+}

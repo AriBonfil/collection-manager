@@ -18,7 +18,7 @@ export default async function useCloneCollections(arrIds: Array<number>) {
     }
 
     for (let i = 0; i < arrIds.length; i++) {
-      fetch(`/_v/collections/clone/${arrIds[i]}`, options)
+      await fetch(`/_v/collections/clone/${arrIds[i]}`, options)
         .then((r) => r.json())
         .then(() => {
           itemsSuccess.push({

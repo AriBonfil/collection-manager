@@ -9,11 +9,13 @@ import {
   //@ts-ignore
   Checkbox, Tooltip, IconInfo, ActionMenu
 } from 'vtex.styleguide'
-//@ts-ignore
-// import OptionsDots from 'vtex.styleguide/OptionsDots';
 
 import { ICollection } from './SelectedActions/actions/useCollections'
-import { Tasks } from './tasks'
+import useCloneCollections from './SelectedActions/actions/useCloneCollections'
+import useDeleteCollections from './SelectedActions/actions/useDeleteCollections'
+import { useTasks } from './Tasks'
+import { columns } from './Columns'
+import { StatusFilter } from './components/status'
 
 export type TableType = {
   id: number,
@@ -25,92 +27,9 @@ export type TableType = {
   active: boolean
 }
 
-const columns = [
-  {
-    id: 'name',
-    title: 'Nombre de la colección',
-    width: '60.8108%',
-  },
-  {
-    id: 'products',
-    title: <div className="tr ws-normal">Productos</div>,
-    width: '10.1351%',
-    minWidth: '10.1351%',
-    cellRenderer: ({ data:{total, type} }:{data: TableType["products"]}) => <div className="tr">{type==="Manual"?total:
-    <div className="flex relative items-center justify-end">
-      n/a <Tooltip label="La cantidad de productos no se aplica ya que se agregaron automáticamente al CMS.">
-        <span className="c-on-base pointer ml2 mt2">
-          <IconInfo size={14}/>
-        </span>
-      </Tooltip>
-    </div>
-  }</div>,
-  },
-  {
-    id: 'id',
-    title: <div className="tr ws-normal">ID</div>,
-    width: '10.1351%',
-    cellRenderer: ({ data }:{data: boolean}) => <div className="tr">{data}</div>,
-  },
-  {
-    id: 'active',
-    title: <div className="tr ws-normal">Estatus</div>,
-    width: '12.1622%',
-    cellRenderer: ({ data }:{data: boolean}) => <div className="flex flex-row justify-end pl2">
-      {
-        data?
-        <div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3">Activa</span><div data-testid="collection-status-tag-style" style={{background:"rgb(139, 195, 74)", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
-        :<div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3">Inactivo</span><div data-testid="collection-status-tag-style" style={{background:"#c6c6c6", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
-      }
-    </div>,
-  },
-  {
-    id: 'actions',
-    width: '3rem',
-    cellRenderer: (props:any) => <Actions {...props} />,
-    /** This column is extended, its data is the entire row */
-    extended: true,
-  },
-]
 
-function Actions({ data }:any) {
-  return (
-    <StopEvent>
-      <ActionMenu
-        buttonProps={{
-          variation: 'tertiary',
-          icon: <IconInfo />,
-        }}
-        options={[
-          {
-            label: 'Detalles',
-            onClick: () =>
-              alert(
-                `Executed action for ${data.name} of price ${data.retailPrice}`
-              ),
-          },
-          {
-            label: 'Clonar',
-            onClick: () =>
-              alert(
-                `Executed action for ${data.name} of price ${data.retailPrice}`
-              ),
-          },
-          {
-            label: 'Eliminar',
-            isDangerous: true,
-            onClick: () =>
-              alert(
-                `Executed a DANGEROUS action for ${data.name} of price ${data.retailPrice}`
-              ),
-          },
-        ]}
-      />
-    </StopEvent>
-  )
-}
 let omitClick1:number = 0;
-const StopEvent:React.FC = ({children})=>{
+export const StopEvent:React.FC = ({children})=>{
   return <div onClick={()=>{
     omitClick1 = Date.now();
   }} style={{
@@ -176,12 +95,17 @@ const Table = () => {
   const {
     collections: {
       items = [],
+      error: errorCollection,
       pagination,
       isLoading,
+      forceUpdate,
       queryParams,
+      sorting,
       setQueryParams
     }
   } = useCollectionManager();
+
+  const { ModalTasks, BotonTasks } = useTasks();
 
   const sliceItems:TableType[] = isLoading || !pagination?[]:items.map((c:ICollection)=>({
     checkbox: false,
@@ -196,7 +120,6 @@ const Table = () => {
 
   const measures = EXPERIMENTAL_useTableMeasures({ size: queryParams.pageSize})
 
-
   const [withCheckboxes,, checkboxes] = useColumnsWithCheckboxes({
     items: sliceItems,
   })
@@ -205,46 +128,16 @@ const Table = () => {
     location.href = `collection-manager/detail/${id}`
   }
 
-  const upload = {
-    label: 'Import',
-    onClick: () => alert('Clicked IMPORT'),
-  }
-
-  const density = {
-    label: 'Line density',
-    compactLabel: 'Compact',
-    regularLabel: 'Regular',
-    comfortableLabel: 'Comfortable',
-  }
-
-
-  const extraActions = {
-    label: 'More options',
-    actions: [
-      {
-        label: 'An action',
-        onClick: () => alert('An action'),
-      },
-      {
-        label: 'Another action',
-        onClick: () => alert('Another action'),
-      },
-      {
-        label: 'A third action',
-        onClick: () => alert('A third action'),
-      },
-    ],
-  }
-
   return (
     <>
-      <Tasks/>
+      {ModalTasks}
       <EXPERIMENTAL_Table
-        loading={isLoading}
+        loading={isLoading || errorCollection}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
           if(Date.now() - omitClick1 < 100 ) return;
           GoToDetalles(rowData.id);
         }}
+        sorting={sorting}
         items={sliceItems}
         columns={withCheckboxes}
         measures={measures}>
@@ -263,13 +156,34 @@ const Table = () => {
             }} />
             <EXPERIMENTAL_Table.Toolbar.ButtonGroup>
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Columns {...buttonColumns} /> */}
-              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Density {...density} />
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Density {...{
+                label: 'Line density',
+                compactLabel: 'Compact',
+                regularLabel: 'Regular',
+                comfortableLabel: 'Comfortable',
+              }} />
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Download {...download} /> */}
-              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...upload} />
-              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.ExtraActions {...extraActions} />
-              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.NewLine {...newLine} /> */}
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...{
+                label: 'Import',
+                onClick: () => alert('Clicked IMPORT'),
+              }} />
+              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.ExtraActions {...{
+                label: 'Mas opciones',
+                actions: [
+                  {
+                    label: 'Actualizar',
+                    onClick: () => forceUpdate(),
+                  },
+                ],
+              }} />
+              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.NewLine {...newLiane} /> */}
             </EXPERIMENTAL_Table.Toolbar.ButtonGroup>
-            <div>AAA</div>
+            <div className='flex flex-grow-1 justify-end items-center'>
+              <span className='mr5'>
+                {BotonTasks}
+              </span>
+              <StatusFilter/>
+            </div>
           </EXPERIMENTAL_Table.Toolbar>
           <EXPERIMENTAL_Table.Pagination {...{
             onPrevClick: ()=> setQueryParams({page: queryParams.page - 1}),
@@ -288,11 +202,15 @@ const Table = () => {
             <EXPERIMENTAL_Table.Bulk.Actions>
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Eliminar',
-                onClick: () => alert("A"),
+                onClick: () => {
+                  useDeleteCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.map(i=> i.id));
+                },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Clonar',
-                onClick: () => alert("A"),
+                onClick: () => {
+                  useCloneCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.map(i=> i.id));
+                },
               }} />
               {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{
                 label: 'Quantity',

@@ -13,8 +13,10 @@ export default class Collection extends ExternalClient {
         headers: {
           ...(options?.headers ?? {}),
           'Content-Type': 'application/json',
+          'cache-control': "no-cache",
           'VtexIdclientAutCookie': context.adminUserAuthToken || context.authToken,
         },
+        timeout: 10000,
       }
     )
   }
@@ -38,7 +40,7 @@ export default class Collection extends ExternalClient {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.get<ICollectionsProductsResponse>(`api/catalog/pvt/collection/${id}/products?page=${page}&pageSize=50`, config);
   }
-  public async deleteCollection(id: String): Promise<any> {
+  public async deleteCollection(id: String | number): Promise<any> {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
     return await this.http.delete(`api/catalog/pvt/collection/${id}`, config);
   }
@@ -53,9 +55,10 @@ export default class Collection extends ExternalClient {
   }
 
   public async AddProductsInCollection(id: Number, Ids: {sku?: number, product?: number}[]) {
+    const items = Ids.map(({product, sku})=>([sku,product,,]));
     const data = [
       ["SKU", "PRODUCTID", "SKUREFID", "PRODUCTREFID"],
-      ...Ids.map(({product, sku})=>([sku,product,,]))
+      ...items
     ];
 		const ws = XLSX.utils.aoa_to_sheet(data);
 
@@ -81,7 +84,8 @@ export default class Collection extends ExternalClient {
         TotalProductsProcessed: number,
         Errors: any[]
       }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
-      if(result.TotalProductsProcessed > 0) return result;
+      console.log("🧊",result, Ids);
+      if(result.TotalProductsProcessed > 0 || items.length === 0) return result;
     }
     throw new Error(`Algo fallo al agregar productos a la collection ${id}`);
   }
@@ -100,7 +104,7 @@ export default class Collection extends ExternalClient {
     while (true) {
       let finish = false;
       let delayProducts: ICollectionsProductItemResponse[] = [];
-      for (let index = 0; delayProducts.length < 400; index++) {
+      for (let index = 0; delayProducts.length < 250; index++) {
         const {value, done} = await iteratorProducts.next();
         if(done){
           finish = true;

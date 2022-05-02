@@ -8,7 +8,6 @@ const BUILD = ()=>{
   const [searchParams, setSearchParams] = useState<useCollectionsProps>({
     get: 'all',
   })
-  // const [refresh, setRefresh] = useState(1)
   const [selectedItems, setSelectedItems] = useState<number[]>([])
   const [editMode, setEditMode] = useState(false)
   const [actualPage, setactualPage] = useState(1)

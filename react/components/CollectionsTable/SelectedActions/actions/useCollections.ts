@@ -1,6 +1,8 @@
+import React from "react";
 import { useState } from "react";
 import { request, useResource } from "react-request-hook";
 import { useQueryParams, NumberParam,withDefault, StringParam } from "use-query-params";
+import {EXPERIMENTAL_useTableSort} from "vtex.styleguide";
 
 export interface CollectionsResponse {
   items:      ICollection[];
@@ -36,12 +38,14 @@ export type useCollectionsProps = {
 }
 
 export const useCollections = (params:useCollectionsProps={})=>{
+  const [cound2, setCound2] = useState(0);
   const [cound, setCound] = useState(0);
   const [queryParams, setQueryParams] = useQueryParams({
     q:  withDefault(StringParam, null),
     page: withDefault(NumberParam, 0),
     pageSize: withDefault(NumberParam, 10),
   });
+  const sorting = EXPERIMENTAL_useTableSort()
 
   const [{data, isLoading, error}] = useResource(()=> request<CollectionsResponse>({
       url: `collections`,
@@ -51,19 +55,62 @@ export const useCollections = (params:useCollectionsProps={})=>{
         get: "all",
         ...params
       }
-  }),[] as any);
+  }),[cound2, params] as any);
+
+
+  const {items, pagination} = React.useMemo(() => {
+    if(!data?.items) return {};
+
+    var list = data.items;
+    var fakeTotal;
+
+    if(sorting.sorted.by) {
+      const by = sorting.sorted.by;
+      const n = sorting.sorted.order === 'ASC'?-1:1;
+      list = list.sort((a,b)=> {
+        if(by === "id") return (a.id-b.id) * n;
+        if(by === "name") return (a.name<b.name?1:-1)*n;
+        if(by === "products") return (a.totalProducts-b.totalProducts) * n;
+        if(by === "active") return ((a.active && !b.active)? 1 :-1)*n;
+        throw new Error(`Soft '${by}' no compatible`);
+      });
+    }
+
+    if(queryParams.q) {
+      list = list.filter(i=> i.name.toLowerCase().includes((queryParams as any).q.toLowerCase()));
+      fakeTotal = list.length;
+    }
+
+    list = list.slice(queryParams.pageSize * queryParams.page, queryParams.pageSize * (queryParams.page + 1))
+
+    return {
+      items: list,
+      pagination: {
+        ...data?.pagination,
+        ...fakeTotal !== undefined?{ total: fakeTotal }:{}
+      }
+    }
+  }, [
+    sorting.sorted,
+    data?.items,
+    queryParams.pageSize,
+    queryParams.page,
+    queryParams.q
+  ])
 
   return {
     isLoading,
     error,
     queryParams,
+    sorting,
     setQueryParams: (v:Parameters<typeof setQueryParams>[0])=>{
       setQueryParams(v, "replaceIn");
       setCound(cound+1)
     },
-    items: data?.items
-      .slice(queryParams.pageSize * queryParams.page, queryParams.pageSize * (queryParams.page + 1))
-      .filter(i=> queryParams.q?i.name.toLowerCase().includes(queryParams.q.toLowerCase()):true),
-    pagination: data?.pagination,
+    forceUpdate: ()=>{
+      setCound2(cound2+1);
+    },
+    items,
+    pagination,
   }
 }
