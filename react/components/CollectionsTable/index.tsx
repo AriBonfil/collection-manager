@@ -1,5 +1,5 @@
 import React from 'react'
-import Table from './Table'
+import {Table} from './Table'
 // import RenderPagination from './RenderPagination'
 // import Filters from './Filters'
 // import EditButton from './EditButton'

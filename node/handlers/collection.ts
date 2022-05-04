@@ -31,9 +31,9 @@ try{
     }
     }
   var data = { collection: collectionData, products: arrProducts}
+  ctx.set('cache-control', 'no-store')
   ctx.body =  JSON.stringify(data)
   ctx.status = 200
-  ctx.set('cache-control', 'no-cache')
   await next()
 } catch (error) {
   console.error("error", error)

@@ -13,7 +13,7 @@ export default class Collection extends ExternalClient {
         headers: {
           ...(options?.headers ?? {}),
           'Content-Type': 'application/json',
-          'cache-control': "no-cache",
+          'cache-control': "no-store",
           'VtexIdclientAutCookie': context.adminUserAuthToken || context.authToken,
         },
         timeout: 10000,
@@ -38,7 +38,7 @@ export default class Collection extends ExternalClient {
   }
   public async getCollectionProducts(id: String | number, page: Number) {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
-    return await this.http.get<ICollectionsProductsResponse>(`api/catalog/pvt/collection/${id}/products?page=${page}&pageSize=50`, config);
+    return await this.http.get<ICollectionsProductsResponse>(`api/catalog/pvt/collection/${id}/products?page=${page}&pageSize=50&t=${Date.now()}`, config);
   }
   public async deleteCollection(id: String | number): Promise<any> {
     var config = {headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : '*',}};
@@ -48,11 +48,20 @@ export default class Collection extends ExternalClient {
 
   public async *getCollectionProductsYield(id: String | number) {
     const collectionProducts = await this.getCollectionProducts(id, 1)
-    for (let i = 0; i < collectionProducts?.TotalPage;i++) {
-      let res = await this.getCollectionProducts(id, i+1)
-      if(res?.Data)  yield {items: res.Data, progreso: i/collectionProducts?.TotalPage};
+    for (let i = 0; i < collectionProducts?.TotalPage;) {
+      try {
+        let res = await this.getCollectionProducts(id, i+1)
+        if(res?.Data){
+          i++;
+          yield {items: res.Data, progreso: i/collectionProducts?.TotalPage};
+        }
+      } catch (error) {
+        console.error(error);
+        await (new Promise(c=> setTimeout(c, 250)));
+      }
     }
   }
+
 
   public async AddProductsInCollection(id: Number, Ids: {sku?: number, product?: number}[]) {
     const items = Ids.map(({product, sku})=>([sku,product,,]));
@@ -78,14 +87,19 @@ export default class Collection extends ExternalClient {
           "knownLength": 1
         }
       };
-      const result = await this.http.post<{
-        TotalItemProcessed: number,
-        TotalErrorsProcessed: number,
-        TotalProductsProcessed: number,
-        Errors: any[]
-      }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
+      try {
+        const result = await this.http.post<{
+          TotalItemProcessed: number,
+          TotalErrorsProcessed: number,
+          TotalProductsProcessed: number,
+          Errors: any[]
+        }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
 
-      if(result.TotalProductsProcessed > 0 || items.length === 0) return result;
+        if(result.TotalProductsProcessed > 0 || items.length === 0) return result;
+      } catch (error) {
+        console.error(error);
+        await new Promise(c=> setTimeout(c,250));
+      }
     }
     throw new Error(`Algo fallo al agregar productos a la collection ${id}`);
   }
@@ -101,17 +115,23 @@ export default class Collection extends ExternalClient {
       dateTo: origin.DateTo
     });
     const iteratorProducts = this.getCollectionProductsYield(id);
+    var lastProgress = 0;
     while (true) {
       let finish = false;
       let delayProducts: ICollectionsProductItemResponse[] = [];
-      for (let index = 0; delayProducts.length < 250; index++) {
+      for (let index = 0; delayProducts.length < 440; index++) {
         const {value, done} = await iteratorProducts.next();
         if(done){
           finish = true;
           break;
         }
         if(value && Array.isArray(value.items)){
-          if(progreso) await progreso(value.progreso);
+          if(progreso){
+            const now = Math.floor(Date.now()/1000);
+            const isSecond = now != lastProgress;
+            lastProgress = now;
+            if(isSecond) await progreso(value.progreso);
+          }
           delayProducts.push(...value.items);
         }
       }

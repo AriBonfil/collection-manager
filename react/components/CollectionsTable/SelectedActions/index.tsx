@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDeleteCollections from './actions/useDeleteCollections'
-import useCloneCollections from './actions/useCloneCollections'
+import {CloneManyCollections} from './actions/tasksCollections'
 import { useCollectionManager } from '../../../context'
 import styled from 'styled-components'
 import ConfirmationModal from './ConfirmationModal'
@@ -64,7 +64,7 @@ const SelectedActions = () => {
             break;
           case 'clone':
             //Pending to implement in service side
-             useCloneCollections(selectedItems)
+             CloneManyCollections(selectedItems)
              alert("La Clonacion de coleccciones todavia no esta disponible, en desarrollo")
             break;
           default:

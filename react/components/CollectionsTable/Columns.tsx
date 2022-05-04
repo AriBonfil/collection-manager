@@ -1,5 +1,5 @@
 import React from "react";
-import { StopEvent, TableType } from "./Table";
+import { GoToDetalles, StopEvent, TableType } from "./Table";
 import { OptionsDots } from '../../resources/icons'
 
 import {
@@ -7,7 +7,7 @@ import {
   Checkbox, Tooltip, IconInfo, ActionMenu
 } from 'vtex.styleguide'
 import useDeleteCollections from "./SelectedActions/actions/useDeleteCollections";
-import useCloneCollections from "./SelectedActions/actions/useCloneCollections";
+import {CloneManyCollections} from "./SelectedActions/actions/tasksCollections";
 
 
 export const columns = [
@@ -73,23 +73,20 @@ function Actions({ data }:{data: TableType}) {
         options={[
           {
             label: 'Detalles',
-            onClick: async () =>{
-              await useDeleteCollections([data.id]);
-            }
+            onClick: () => GoToDetalles(data.id)
           },
           {
             label: 'Clonar',
             onClick: async () =>{
-              await useCloneCollections([data.id]);
+              await CloneManyCollections([data.id]);
             }
           },
           {
             label: 'Eliminar',
             isDangerous: true,
-            onClick: () =>
-              alert(
-                `Executed a DANGEROUS action for ${data.name} of price ${data.id}`
-              ),
+            onClick: async () =>{
+              await useDeleteCollections([data.id])
+            }
           },
         ]}
       />

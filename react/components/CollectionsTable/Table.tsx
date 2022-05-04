@@ -11,8 +11,7 @@ import {
 } from 'vtex.styleguide'
 
 import { ICollection } from './SelectedActions/actions/useCollections'
-import useCloneCollections from './SelectedActions/actions/useCloneCollections'
-import useDeleteCollections from './SelectedActions/actions/useDeleteCollections'
+import {CloneManyCollections, DeleteManyCollections} from './SelectedActions/actions/tasksCollections'
 import { useTasks } from './Tasks'
 import { columns } from './Columns'
 import { StatusFilter } from './components/status'
@@ -47,7 +46,7 @@ export const StopEvent:React.FC = ({children})=>{
 function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
   const checkboxes = EXPERIMENTAL_useCheckboxTree({
     items,
-    onToggle: ({ checkedItems }:any) => console.table(checkedItems),
+    // onToggle: ({ checkedItems }:any) => console.table(checkedItems),
   })
 
   const mapped:any = {};
@@ -91,7 +90,11 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
   return [withCheckboxes, (data:TableType) => checkboxes.isChecked(data), checkboxes]
 }
 
-const Table = () => {
+export const GoToDetalles = (id:number)=>{
+  location.href = `collection-manager/detail/${id}`
+}
+
+export const Table = () => {
   const {
     collections: {
       items = [],
@@ -124,11 +127,8 @@ const Table = () => {
     items: sliceItems,
   })
 
-  const GoToDetalles = (id:number)=>{
-    location.href = `collection-manager/detail/${id}`
-  }
 
-  return (
+  return  (
     <>
       {ModalTasks}
       <EXPERIMENTAL_Table
@@ -203,13 +203,13 @@ const Table = () => {
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Eliminar',
                 onClick: () => {
-                  useDeleteCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.map(i=> i.id));
+                  DeleteManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
                 },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Clonar',
                 onClick: () => {
-                  useCloneCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.map(i=> i.id));
+                  CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
                 },
               }} />
               {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{
@@ -240,7 +240,7 @@ const Table = () => {
                   onClick: (checkboxes as any).checkAll,
                 }}
                 active={(checkboxes as any).allChecked}>
-                Colecciones seleccionadas: {items.length}
+                Seleccionadas: {items.length}
               </EXPERIMENTAL_Table.Bulk.Tail.Toggle>
               <EXPERIMENTAL_Table.Bulk.Tail.Dismiss onClick={(checkboxes as any).uncheckAll} />
             </EXPERIMENTAL_Table.Bulk.Tail>
@@ -249,5 +249,3 @@ const Table = () => {
     </>
   )
 }
-
-export default Table

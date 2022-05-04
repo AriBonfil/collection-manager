@@ -17,9 +17,13 @@ export enum ActionState {
 
 // var taskManager:TaskManager = undefined as any;
 
+type TableA = string[];
+type TableB = ActionBase[];
+
+
 export class TaskManager{
-  static KEY_ENV = "fzCrs";
-  static KEY_LIST = "2BuYv";
+  static KEY_TABLE_A = "phI6o";
+  static KEY_TABLE_B = "61ZfG";
 
   constructor(public ctx: Context){
 
@@ -31,22 +35,45 @@ export class TaskManager{
     return new TaskManager(ctx);
   }
 
+  async getIndexAll(){
+    return await this.ctx.clients.vbase.getJSON<TableA>(TaskManager.KEY_TABLE_A, "INDEX", true) || [];
+  }
+
+  async saveIndexAll(list: TableA){
+    await this.ctx.clients.vbase.saveJSON<TableA>(TaskManager.KEY_TABLE_A, "INDEX", list);
+  }
+
+  async pushIndex(ids:TableA){
+    const list = await this.getIndexAll();
+    list.unshift(...ids);
+    await this.saveIndexAll(list);
+  }
+
   async getActionAll(){
-    return await this.ctx.clients.vbase.getJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, true) || [];
+    const listIds = await this.getIndexAll();
+    var list = await Promise.all(listIds.map(id=> this.ctx.clients.vbase.getJSON<TableB[0]>(TaskManager.KEY_TABLE_B, id, true)))
+    list.map(l=>{
+      if((l.editAt || 0) + (1000 * 20) < Date.now() && l.state === ActionState.RUNING){
+        l.state = ActionState.ERROR;
+        l.error = {
+          message: "La tarea no se completo bien."
+        }
+      }
+    })
+    return list;
   }
 
   async updateAction(action: ActionBase){
-    const actions = await this.getActionAll();
-    actions[actions.findIndex(a=> a.id === action.id)] = action;
+    // const actions = await this.getActionAll();
+    // actions[actions.findIndex(a=> a.id === action.id)] = action;
     action.editAt = Date.now()
-    await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actions);
+    await this.ctx.clients.vbase.saveJSON<ActionBase>(TaskManager.KEY_TABLE_B, action.id, action);
   }
 
   async deleteAction(action: ActionBase){
-    const actions = await this.getActionAll();
-    actions.splice(actions.findIndex(a=> a.id === action.id), 1)
-    action.editAt = Date.now()
-    await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actions);
+    const list = await this.getIndexAll();
+    list.splice(list.findIndex(id=> id === action.id), 1)
+    await this.saveIndexAll(list);;
   }
 
   GetTask(action: ActionBase){
@@ -100,17 +127,18 @@ export class TaskManager{
       return action;
     });
 
-    await this.ctx.clients.vbase.saveJSON<ActionBase[]>(TaskManager.KEY_ENV, TaskManager.KEY_LIST, actions);
+    await Promise.all(actions.map(a=> this.updateAction(a)))
+    await this.saveIndexAll(actions.map(a=> a.id));
     return actions;
   }
 
   async run_next(){
     const list = await this.getActionAll();
 
-    var runing = list.filter(l=> l.state === ActionState.RUNING);
+    const runing = list.filter(l=> l.state === ActionState.RUNING);
     if(runing.length > 0) return;
 
-    var waiting = list.find(l=> l.state === ActionState.WAIT_FOR_RUN);
+    const waiting = list.find(l=> l.state === ActionState.WAIT_FOR_RUN);
     if(!waiting) return;
 
     const task = this.GetTask(waiting);

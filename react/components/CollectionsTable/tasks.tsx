@@ -32,11 +32,11 @@ export type ActionBase = {
 }
 
 
-const Verificado = (props: SVGProps<SVGSVGElement>) => (
+const Verificado = ({size=14,...props}: SVGProps<SVGSVGElement> & {size?: number}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={14}
-    height={14}
+    width={size}
+    height={size}
     viewBox="0 0 172 172"
     style={{
       fill: "#8BC34A",
@@ -62,11 +62,11 @@ const Verificado = (props: SVGProps<SVGSVGElement>) => (
     </g>
   </svg>
 )
-const Error = (props: SVGProps<SVGSVGElement>) => (
+const Error = ({size=14,...props}: SVGProps<SVGSVGElement> & {size?: number}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={14}
-    height={14}
+    width={size}
+    height={size}
     viewBox="0 0 172 172"
     style={{
       fill: "#D1011B",
@@ -98,7 +98,7 @@ const useSyncTasks = ()=>{
   const reload = ()=> setCound(cound+1);
 
   const [{data, isLoading, error}] = useResource(()=> request<ActionBase[]>({
-    url: `collections/tasks`,
+    url: `collections/tasks?t=${Date.now()}`,
     method: "GET",
     params:{}})
   ,[cound] as any);
@@ -123,6 +123,7 @@ const useSyncTasks = ()=>{
 
 const BuildText = (action: ActionBase)=>{
   if(action.task === "clone") return `Clonado (${(action.params as any).id})`;
+  if(action.task === "delete") return `Eliminado (${(action.params as any).id})`;
   return "Desconocido";
 }
 
@@ -160,25 +161,90 @@ const useTasksToast = (tasks:ActionBase[])=>{
   };
 }
 
+type ModalTasksProps= {
+  tasks: ActionBase[]
+}
+const ModalTasks:React.FC<ModalTasksProps> = ({tasks})=>{
+  return (
+    <div className={cn("tasks-list")}>
+      {tasks.map((t)=>{
+        const seconds = ((((t.editAt - t.createAt) / t.progress.value)/1000) * (1 - t.progress.value)).toFixed(0);
+        return <div key={t.id} className={cn("tasks","pb5", `task-${t.state}`)} >
+          <div className="flex justify-between pb3">
+            <div className="flex items-center">
+              <span className="">{BuildText(t)}</span>
+            </div>
+            <div className="flex items-center task-info">
+              {t.state===ActionState.RUNING && !Number.isFinite(seconds) && <>
+                <span className="mr1 gray">{ seconds +" s"}</span>
+                <span className="mr1 mb2 gray">.</span>
+              </>}
+
+              <span className="mr2 gray">{`${Math.round(t.progress.value * 100)}%`}</span>
+              <span className="task-state">
+                { t.state === ActionState.COMPLETE &&
+                  <Tooltip label={ t.ms<1000? `${t.ms}ms`:`${t.ms/1000}s` }>
+                    <span>
+                      <Verificado/>
+                    </span>
+                  </Tooltip>
+                  }
+                { t.state === ActionState.ERROR &&
+                  <Tooltip label={
+                    <div style={{overflowWrap: "anywhere"}}>
+                      <div className="pb2">{t.error.message}</div>
+                      <div className="f7">{t.error.stack}</div>
+                    </div>
+                  }>
+                    <span>
+                      <Error/>
+                    </span>
+                  </Tooltip>
+                }
+                { t.state === ActionState.RUNING && <Spinner size={12}/> }
+              </span>
+            </div>
+          </div>
+          <Progress type="line" percent={t.progress.value * 100} danger={t.state === ActionState.ERROR}/>
+        </div>
+      })}
+    </div>
+  );
+}
+
+
+type BotonTasksProps= {
+  tasks: ActionBase[],
+  onClick?: ()=>void
+}
+const BotonTasks:React.FC<BotonTasksProps> = ({tasks, onClick})=>{
+
+  let status = null;
+  if(tasks.find(t=> t.state === ActionState.COMPLETE)) status = <Verificado size={16}/>;
+  if(tasks.find(t=> t.state === ActionState.WAIT_FOR_RUN)) status = <Spinner size={14}/>;
+  if(tasks.find(t=> t.state === ActionState.RUNING)) status = <Spinner size={14}/>;
+  if(tasks.find(t=> t.state === ActionState.ERROR)) status = <Error size={16}/>;
+
+  const tasksOld = tasks.every(t=> (Date.now() - t.editAt) > 1000 * 60);
+  const taskOK = tasks.filter(t=> t.state === ActionState.COMPLETE);
+
+  if(!status) return null;
+
+  return (
+    <div onClick={onClick} className="tasks-button flex items-center" style={{...tasksOld?{opacity: 0.5}:{}}}>
+      {status} <span className="ml2">{`${taskOK.length}/${tasks.length}`}</span>
+    </div>
+  );
+};
+
 export const useTasks = ()=>{
   const [isOpen, setOpen] = useState(false);
   const {tasks} = useSyncTasks();
 
   const {Toast} = useTasksToast(tasks);
 
-  var isStatus = null;
-  if(tasks.find(t=> t.state === ActionState.WAIT_FOR_RUN)) isStatus = "wait for run";
-  if(tasks.find(t=> t.state === ActionState.COMPLETE)) isStatus = "complete";
-  if(tasks.find(t=> t.state === ActionState.ERROR)) isStatus = "error";
-  if(tasks.find(t=> t.state === ActionState.RUNING)) isStatus = "running";
-
-
   return {
-     BotonTasks: isStatus && (
-      <div onClick={()=> setOpen(true)}>
-        {isStatus}
-      </div>
-     ),
+      BotonTasks: <BotonTasks onClick={()=> setOpen(true)} tasks={tasks}/>,
       ModalTasks: (
         <>
           {Toast}
@@ -188,51 +254,9 @@ export const useTasks = ()=>{
             size="small"
             title="Actividad"
           >
-            <div className={cn("tasks-list")}>
-              {tasks.map((t)=>{
-                return <div className={cn("tasks","pb5", `task-${t.state}`)} >
-                  <div className="flex justify-between pb3">
-                    <div className="flex items-center">
-                      <span className="">{BuildText(t)}</span>
-                    </div>
-                    <div className="flex items-center task-info">
-                      {t.state===ActionState.RUNING && <>
-                        <span className="mr1 gray">{((((t.editAt - t.createAt) / t.progress.value)/1000) * (1 - t.progress.value)).toFixed(0) +" s"}</span>
-                        <span className="mr1 mb2 gray">.</span>
-                      </>}
-
-                      <span className="mr2 gray">{`${Math.round(t.progress.value * 100)}%`}</span>
-                      <span className="task-state">
-                        { t.state === ActionState.COMPLETE &&
-                          <Tooltip label={ t.ms<1000? `${t.ms}ms`:`${t.ms/1000}s` }>
-                            <span>
-                              <Verificado/>
-                            </span>
-                          </Tooltip>
-                          }
-                        { t.state === ActionState.ERROR &&
-                          <Tooltip label={
-                            <div style={{overflowWrap: "anywhere"}}>
-                              <div className="pb2">{t.error.message}</div>
-                              <div className="f7">{t.error.stack}</div>
-                            </div>
-                          }>
-                            <span>
-                              <Error/>
-                            </span>
-                          </Tooltip>
-                        }
-                        { t.state === ActionState.RUNING && <Spinner size={12}/> }
-                      </span>
-                    </div>
-                  </div>
-                  <Progress type="line" percent={t.progress.value * 100} danger={t.state === ActionState.ERROR}/>
-                </div>
-              })}
-            </div>
+            <ModalTasks tasks={tasks}/>
           </EXPERIMENTAL_Modal>
         </>
       )
-
    }
 };

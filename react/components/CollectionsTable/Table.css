@@ -57,3 +57,13 @@ table tbody tr:nth-child(odd) {
 :global(.vtex-styleguide-9-x-popup){
   z-index: 99999999999 !important;
 }
+
+:global(.tasks-button){
+  border-radius: .25rem;
+  height: 31px;
+  border: 1px solid #e3e4e6;
+  background: white;
+  padding-right: 8px;
+  padding-left: 8px;
+  color: #134cd8;
+}

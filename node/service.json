@@ -3,7 +3,7 @@
 	"memory": 1024,
 	"runtimeArgs": ["--max_old_space_size=800"],
 	"ttl": 300,
-	"timeout": 100,
+	"timeout": 1000,
 	"routes": {
 		"tasks": {
 			"path": "/_v/collections/tasks",
