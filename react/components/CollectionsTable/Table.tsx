@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useCollectionManager } from '../../context'
 import './Table.css'
 
@@ -125,7 +125,7 @@ export const Table = () => {
     },
   }))
 
-  const measures = EXPERIMENTAL_useTableMeasures({ size: queryParams.pageSize  })
+  const measures = EXPERIMENTAL_useTableMeasures({ size: isLoading? 10 : queryParams.pageSize  })
 
   const {withCheckboxes, checkboxes} = useColumnsWithCheckboxes({
     items: sliceItems,
@@ -140,6 +140,8 @@ export const Table = () => {
       },
     })),
   })
+
+  useEffect(checkboxes.uncheckAll,[queryParams.q, queryParams.status]);
 
   const isLoadingState = isLoading || errorCollection;
 
