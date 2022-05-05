@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { request, useResource } from "react-request-hook";
 import { NumberParam,withDefault, StringParam, createEnumParam, QueryParamConfig } from "use-query-params";
@@ -64,9 +64,13 @@ export const useCollections = ()=>{
     q:  withDefault(StringParam, null),
     page: withDefault(NumberParam, 0),
     pageSize: withDefault(NumberParam, 10),
-    status: withDefault(createEnumParam(["active","inactive","all"]),GetType.ALL) as QueryParamConfig<string | null | undefined, GetType>
+    status: withDefault(createEnumParam(["active","inactive","all"]),GetType.ALL) as QueryParamConfig<string | null | undefined, GetType>,
+    soft: withDefault(StringParam, null),
   });
-  const sorting = EXPERIMENTAL_useTableSort()
+  const sorting = EXPERIMENTAL_useTableSort(queryParams.soft?JSON.parse(queryParams.soft):undefined)
+  useEffect(()=> {
+    setQueryParams({page: 0 , soft: JSON.stringify(sorting.sorted)})
+  },[sorting.sorted]);
 
   const [collections, isLoading, errorCollection, forceUpdate] = useFindCollections({get: GetType.ALL});
 
@@ -124,6 +128,7 @@ export const useCollections = ()=>{
     sorting,
     setQueryParams,
     forceUpdate,
+    itemsAll:collections?.items,
     items,
     pagination,
   }

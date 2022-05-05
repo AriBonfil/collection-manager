@@ -43,9 +43,9 @@ export const StopEvent:React.FC = ({children})=>{
 }
 
 //hook to handle checkboxes
-function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
+function useColumnsWithCheckboxes({ items, itemsAll }:{items:TableType[], itemsAll:TableType[]}) {
   const checkboxes = EXPERIMENTAL_useCheckboxTree({
-    items,
+    items: itemsAll,
     // onToggle: ({ checkedItems }:any) => console.table(checkedItems),
   })
 
@@ -66,6 +66,7 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
     )
   })
 
+  const isCheck = items.length > 0? items.every(i=> checkboxes.isChecked(i)): false;
   const withCheckboxes = [
     {
       id: 'checkbox',
@@ -73,9 +74,9 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
         <StopEvent>
           <Checkbox
             id={`${checkboxes.itemTree.id}`}
-            checked={checkboxes.allChecked}
-            partial={checkboxes.someChecked}
-            onChange={checkboxes.toggleAll}
+            checked={isCheck}
+            partial={items.some(i=> checkboxes.isChecked(i))}
+            onChange={()=> isCheck?items.forEach(i=> checkboxes.uncheck(i)):items.forEach(i=> checkboxes.check(i))}
           />
         </StopEvent>
       ),
@@ -87,7 +88,11 @@ function useColumnsWithCheckboxes({ items }:{items:TableType[]}) {
   ]
 
   // [parsed columns, isRowActive function, checked items, allChecked]
-  return [withCheckboxes, (data:TableType) => checkboxes.isChecked(data), checkboxes]
+  // return [withCheckboxes, (data:TableType) => checkboxes.isChecked(data), checkboxes]
+  return {
+    withCheckboxes,
+    checkboxes
+  }
 }
 
 export const GoToDetalles = (id:number)=>{
@@ -97,6 +102,7 @@ export const GoToDetalles = (id:number)=>{
 export const Table = () => {
   const {
     items = [],
+    itemsAll = [],
     errorCollection,
     pagination,
     isLoading,
@@ -121,8 +127,18 @@ export const Table = () => {
 
   const measures = EXPERIMENTAL_useTableMeasures({ size: queryParams.pageSize  })
 
-  const [withCheckboxes,, checkboxes] = useColumnsWithCheckboxes({
+  const {withCheckboxes, checkboxes} = useColumnsWithCheckboxes({
     items: sliceItems,
+    itemsAll: itemsAll.map((c:ICollection)=>({
+      checkbox: false,
+      id: c.id,
+      name: c.name,
+      active: c.active,
+      products: {
+        total: c.totalProducts,
+        type: c.type
+      },
+    })),
   })
 
   const isLoadingState = isLoading || errorCollection;
@@ -215,6 +231,12 @@ export const Table = () => {
                   CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
                 },
               }} />
+              <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
+                label: 'Bloquear',
+                onClick: () => {
+                  CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                },
+              }} />
               {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{
                 label: 'Quantity',
                 actions: [
@@ -234,18 +256,25 @@ export const Table = () => {
             <EXPERIMENTAL_Table.Bulk.Tail>
               {!(checkboxes as any).allChecked && (
                 <EXPERIMENTAL_Table.Bulk.Tail.Info>
-                  Colecciones seleccionadas: {(checkboxes as any).checkedItems.length}
+                  {checkboxes.checkedItems.length} Colecciones
                 </EXPERIMENTAL_Table.Bulk.Tail.Info>
               )}
-              <EXPERIMENTAL_Table.Bulk.Tail.Toggle
+              {/* <EXPERIMENTAL_Table.Bulk.Tail.Toggle
                 button={{
-                  text: `Seleccionar todas ${items.length}`,
+                  text: `Pagina ${sliceItems.length}`,
+                  onClick: ()=> checkboxes.setChecked(sliceItems),
+                }}
+                active={sliceItems.every(i=> checkboxes.isChecked(i))}>
+              </EXPERIMENTAL_Table.Bulk.Tail.Toggle> */}
+              {/* <EXPERIMENTAL_Table.Bulk.Tail.Toggle
+                button={{
+                  text: `Todas ${itemsAll.length}`,
                   onClick: (checkboxes as any).checkAll,
                 }}
                 active={(checkboxes as any).allChecked}>
-                Seleccionadas: {items.length}
-              </EXPERIMENTAL_Table.Bulk.Tail.Toggle>
-              <EXPERIMENTAL_Table.Bulk.Tail.Dismiss onClick={(checkboxes as any).uncheckAll} />
+                Colecciones seleccionadas: {checkboxes.checkedItems.length}
+              </EXPERIMENTAL_Table.Bulk.Tail.Toggle> */}
+              <EXPERIMENTAL_Table.Bulk.Tail.Dismiss onClick={checkboxes.uncheckAll} />
             </EXPERIMENTAL_Table.Bulk.Tail>
           </EXPERIMENTAL_Table.Bulk>
       </EXPERIMENTAL_Table>
