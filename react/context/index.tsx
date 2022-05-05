@@ -20,36 +20,6 @@ const BUILD = ()=>{
   const collections = useCollections({
     ...searchParams
   });
-
-  // useEffect(() => {
-  //   let queryString = Object.keys(searchParams).map(key => key + '=' + (searchParams as any)[key]).join('&');
-  //   fetch(`/_v/collections?${queryString}`)
-  //     .then(res => res.json())
-  //     .then((resJson:CollectionsResponse) => {
-  //       if(resJson) {
-  //         let dataToSet = getChunkedArrayByPagination(resJson.items, resJson.pagination)
-  //         setData(dataToSet)
-  //         setactualPage(1)
-  //         setSelectedItems([])
-  //         setpaginationProps({
-  //           total: resJson.pagination?.total,
-  //           show: resJson.items?.length > 0 ? true : false,
-  //           pageSize: resJson.pagination?.perPage
-  //         })
-  //       }
-  //     })
-  //     .catch(err => console.log("error al req", err));
-  // }, [searchParams, refresh])
-
-  // const getChunkedArrayByPagination = (items:ICollection[], pagination: CollectionsResponse["pagination"]) => {
-  //   let chunkSize = pagination.perPage
-  //   const res = [];
-  //   for (let i = 0; i < items.length; i += chunkSize) {
-  //       const chunk = items.slice(i, i + chunkSize);
-  //       res.push(chunk);
-  //   }
-  //   return res;
-  // }
   const isCollectionSelected = (id:number) => {
     return selectedItems.find(i => i === id)
   }
@@ -57,7 +27,6 @@ const BUILD = ()=>{
   const refreshData = () => {
     // setRefresh(Math.random())
   }
-
 
   return {
     collections,

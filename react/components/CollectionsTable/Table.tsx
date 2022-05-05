@@ -127,12 +127,13 @@ export const Table = () => {
     items: sliceItems,
   })
 
+  const isLoadingState = isLoading || errorCollection;
 
   return  (
     <>
       {ModalTasks}
       <EXPERIMENTAL_Table
-        loading={isLoading || errorCollection}
+        loading={isLoadingState}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
           if(Date.now() - omitClick1 < 100 ) return;
           GoToDetalles(rowData.id);
@@ -145,13 +146,13 @@ export const Table = () => {
             <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
               value: queryParams.q,
               placeholder: 'Buscar...',
-              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
+              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: "0" }),
               onClear: () => {
-                setQueryParams({q: null, page: 0})
+                setQueryParams({q: undefined, page: "0"})
               },
               onSubmit: (e:any) => {
                 e.preventDefault()
-                setQueryParams({q: null, page: 0})
+                setQueryParams({q: undefined, page: "0"})
               },
             }} />
             <EXPERIMENTAL_Table.Toolbar.ButtonGroup>
@@ -185,19 +186,21 @@ export const Table = () => {
               <StatusFilter/>
             </div>
           </EXPERIMENTAL_Table.Toolbar>
-          <EXPERIMENTAL_Table.Pagination {...{
-            onPrevClick: ()=> setQueryParams({page: queryParams.page - 1}),
-            onNextClick: ()=> setQueryParams({page: queryParams.page + 1}),
-            onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 0}),
-            tableSize: queryParams.pageSize,
-            currentPage: queryParams.page,
-            currentItemFrom: queryParams.pageSize * queryParams.page,
-            currentItemTo: queryParams.pageSize * (queryParams.page + 1),
-            textOf: 'de',
-            rowsOptions: [10, 15,25,50],
-            textShowRows: 'Colecciones mostradas',
-            totalItems:  pagination?.total,
-          }}/>
+          {!isLoadingState &&
+            <EXPERIMENTAL_Table.Pagination {...{
+              onPrevClick: ()=> setQueryParams({page: (queryParams.page - 1).toString()}),
+              onNextClick: ()=> setQueryParams({page: (queryParams.page + 1).toString()}),
+              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value).toString(), page: "0"}),
+              tableSize: queryParams.pageSize,
+              currentPage: queryParams.page,
+              currentItemFrom: queryParams.pageSize * queryParams.page,
+              currentItemTo: queryParams.pageSize * (queryParams.page + 1),
+              textOf: 'de',
+              rowsOptions: [10, 15,25,50],
+              textShowRows: 'Colecciones mostradas',
+              totalItems:  pagination?.total,
+            }}/>
+          }
           <EXPERIMENTAL_Table.Bulk active={(checkboxes as any).someChecked}>
             <EXPERIMENTAL_Table.Bulk.Actions>
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{

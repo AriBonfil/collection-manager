@@ -1,0 +1,17 @@
+query($id: ID!) {
+  collection(id: $id) {
+    cacheId
+    id
+    name
+    searchable
+    highlight
+    dateFrom
+    dateTo
+    hasExpirationDate
+    status
+    totalProducts
+    description
+    lastEditor
+    type
+  }
+}

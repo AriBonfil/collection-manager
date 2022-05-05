@@ -1,32 +1,22 @@
 import React from 'react'
-import styled from 'styled-components'
+import { ICollection } from '../../CollectionsTable/SelectedActions/actions/useCollections';
 
-//# ANY #
-const CollectionInfo:React.FC<{data: any}> = ({data}) => {
-  const Container = styled.div`
-    background-color: white;
-    margin: 2rem;
-    padding: 2rem;
-    border-radius: 21px;
-    width: fit-content;
-    height: fit-content;
-    font-size: larger;
-  `;
+const CollectionInfo:React.FC<{data: ICollection } & JSX.IntrinsicElements["div"]> = ({data, ...props}) => {
+
+  if(!data) return null;
 
   return (
-    <>
-    {data && <Container>
-      <h6>Product name: {data.Name}</h6>
-      <h6>Product id: {data.Id}</h6>
-      <h6>Searchable {data.Searchable ? 'Si' : 'No' }</h6>
-      <h6>Highlight {data.Highlight ? 'Si' : 'No' }</h6>
-      <h6>Date From {data.DateFrom}</h6>
-      <h6>Date To {data.DateTo}</h6>
-      <h6>Total Products: {data.TotalProducts}</h6>
-      <h6>Type: {data.Type}</h6>
-      <p>Description: {data.Description}</p>
-      </Container>}
-    </>
+    <div {...props}>
+      <p>Product name: {data.name}</p>
+      <p>Product id: {data.id}</p>
+      <p>Searchable {data.searchable ? 'Si' : 'No' }</p>
+      <p>Highlight {data.highlight ? 'Si' : 'No' }</p>
+      <p>Date From {data.dateFrom}</p>
+      <p>Date To {data.dateTo}</p>
+      <p>Total Products: {data.totalProducts}</p>
+      <p>Type: {data.type}</p>
+      <p>Description: {data.description}</p>
+    </div>
   )
 }
 

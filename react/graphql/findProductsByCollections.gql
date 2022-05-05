@@ -1,0 +1,22 @@
+query($collectionId: ID!, $page: Int!, $pageSize: Int!) {
+  products(
+    collectionId: $collectionId
+    page: $page
+    pageSize: $pageSize
+    term: ""
+  ) {
+    items {
+      id
+      name
+      imageUrl
+      ref
+      detailUrl
+    }
+    paging {
+      page
+      perPage
+      total
+      pages
+    }
+  }
+}

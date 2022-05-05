@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { request, useResource } from "react-request-hook";
-import { useQueryParams, NumberParam,withDefault, StringParam } from "use-query-params";
 import {EXPERIMENTAL_useTableSort} from "vtex.styleguide";
+import { useSearchParameters } from "../../../../utils/searchParameters";
 
 export interface CollectionsResponse {
   items:      ICollection[];
@@ -13,6 +13,7 @@ export interface ICollection {
   id:             number;
   name:           string;
   searchable:     boolean;
+  description?:   boolean;
   highlight:      boolean;
   dateFrom:       string;
   dateTo:         string;
@@ -40,11 +41,17 @@ export type useCollectionsProps = {
 export const useCollections = (params:useCollectionsProps={})=>{
   const [cound2, setCound2] = useState(0);
   const [cound, setCound] = useState(0);
-  const [queryParams, setQueryParams] = useQueryParams({
-    q:  withDefault(StringParam, null),
-    page: withDefault(NumberParam, 0),
-    pageSize: withDefault(NumberParam, 10),
+  const {searchParams, setQueryParams} = useSearchParameters<{q:string, page: string, pageSize: string}>({
+    q:  undefined,
+    page: "1",
+    pageSize: "10",
   });
+  const queryParams = {
+    q: searchParams.q,
+    page: parseInt(searchParams.page),
+    pageSize: parseInt(searchParams.pageSize),
+  }
+
   const sorting = EXPERIMENTAL_useTableSort()
 
   const [{data, isLoading, error}] = useResource(()=> request<CollectionsResponse>({
@@ -104,7 +111,7 @@ export const useCollections = (params:useCollectionsProps={})=>{
     queryParams,
     sorting,
     setQueryParams: (v:Parameters<typeof setQueryParams>[0])=>{
-      setQueryParams(v, "replaceIn");
+      setQueryParams(v);
       setCound(cound+1)
     },
     forceUpdate: ()=>{

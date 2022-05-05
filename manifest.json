@@ -14,6 +14,7 @@
     "graphql": "1.x"
   },
   "dependencies": {
+    "vtex.catalog-graphql": "1.x",
     "vtex.styleguide": "9.x"
   },
   "registries": [
