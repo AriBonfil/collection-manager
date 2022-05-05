@@ -58,7 +58,7 @@ export const columns = [
       {
         data.active?
         <div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3" style={data.active?{}:{color: "#979899"}}>Activa</span><div data-testid="collection-status-tag-style" style={{background:"rgb(139, 195, 74)", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
-        :<div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3" style={data.active?{}:{color: "#979899"}}>Inactivo</span><div data-testid="collection-status-tag-style" style={{background:"#c6c6c6", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
+        :<div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3" style={data.active?{}:{color: "#979899"}}>Inactivo</span><div data-testid="collection-status-tag-style" style={{background:"rgb(196, 196, 196)", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
       }
     </div>,
   },
