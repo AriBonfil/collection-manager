@@ -19,10 +19,8 @@ import { StatusFilter } from './components/status'
 export type TableType = {
   id: number,
   name: string,
-  products: {
-    total: number,
-    type: "Automatic" | "Manual"
-  },
+  total: number,
+  type: "Automatic" | "Manual",
   active: boolean
 }
 
@@ -119,10 +117,8 @@ export const Table = () => {
     id: c.id,
     name: c.name,
     active: c.active,
-    products: {
-      total: c.totalProducts,
-      type: c.type
-    },
+    total: c.totalProducts,
+    type: c.type
   }))
 
   const measures = EXPERIMENTAL_useTableMeasures({ size: isLoading? 10 : queryParams.pageSize  })
@@ -134,10 +130,8 @@ export const Table = () => {
       id: c.id,
       name: c.name,
       active: c.active,
-      products: {
-        total: c.totalProducts,
-        type: c.type
-      },
+      total: c.totalProducts,
+      type: c.type
     })),
   })
 
@@ -225,18 +219,21 @@ export const Table = () => {
                 label: 'Eliminar',
                 onClick: () => {
                   DeleteManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                  checkboxes.uncheckAll();
                 },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Clonar',
                 onClick: () => {
                   CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                  checkboxes.uncheckAll();
                 },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Bloquear',
                 onClick: () => {
                   CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                  checkboxes.uncheckAll();
                 },
               }} />
               {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{

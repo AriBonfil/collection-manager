@@ -16,6 +16,10 @@ export const columns = [
     sortable: true,
     title: 'Nombre de la colección',
     width: '60.8108%',
+    extended: true,
+    cellRenderer: ({ data }:{data: TableType}) => {
+      return <div style={data.active?{}:{color: "#979899"}}>{data.name}</div>
+    },
   },
   {
     id: 'products',
@@ -23,7 +27,8 @@ export const columns = [
     title: <div className="tr ws-normal">Productos</div>,
     width: '10.1351%',
     minWidth: '10.1351%',
-    cellRenderer: ({ data:{total, type} }:{data: TableType["products"]}) => <div className="tr">{type==="Manual"?total:
+    extended: true,
+    cellRenderer: ({ data }:{data: TableType}) => <div className="tr" style={data.active?{}:{color: "#979899"}}>{data.type==="Manual"?data.total:
     <div className="flex relative items-center justify-end">
       n/a <Tooltip label="La cantidad de productos no se aplica ya que se agregaron automáticamente al CMS.">
         <span className="c-on-base pointer ml2 mt2">
@@ -38,18 +43,22 @@ export const columns = [
     sortable: true,
     title: <div className="tr ws-normal">ID</div>,
     width: '10.1351%',
-    cellRenderer: ({ data }:{data: boolean}) => <div className="tr">{data}</div>,
+    extended: true,
+    cellRenderer: ({ data }:{data: TableType}) => {
+      return <div className="tr" style={data.active?{}:{color: "#979899"}}>{data.id}</div>
+    },
   },
   {
     id: 'active',
     sortable: true,
     title: <div className="tr ws-normal">Estatus</div>,
     width: '12.1622%',
-    cellRenderer: ({ data }:{data: boolean}) => <div className="flex flex-row justify-end pl2">
+    extended: true,
+    cellRenderer: ({ data }:{data: TableType}) => <div className="flex flex-row justify-end pl2">
       {
-        data?
-        <div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3">Activa</span><div data-testid="collection-status-tag-style" style={{background:"rgb(139, 195, 74)", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
-        :<div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3">Inactivo</span><div data-testid="collection-status-tag-style" style={{background:"#c6c6c6", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
+        data.active?
+        <div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3" style={data.active?{}:{color: "#979899"}}>Activa</span><div data-testid="collection-status-tag-style" style={{background:"rgb(139, 195, 74)", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
+        :<div className="flex relative items-center" data-testid="collection-status-tag"><span className="pr3" style={data.active?{}:{color: "#979899"}}>Inactivo</span><div data-testid="collection-status-tag-style" style={{background:"#c6c6c6", height: "10px", width: "10px", borderRadius: "100%"}}></div></div>
       }
     </div>,
   },
