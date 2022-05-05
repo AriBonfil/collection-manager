@@ -61,7 +61,7 @@ export const StatusFilter:React.FC<StatusFilterProps> = ()=>{
         })
         setSearchParams(obj);
         collections.setQueryParams({
-          page: "0"
+          page: 0
         });
       }}
       // clearAllFiltersButtonLabel="Clear Filters"

@@ -146,13 +146,13 @@ export const Table = () => {
             <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
               value: queryParams.q,
               placeholder: 'Buscar...',
-              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: "0" }),
+              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
               onClear: () => {
-                setQueryParams({q: undefined, page: "0"})
+                setQueryParams({q: null, page: 0})
               },
               onSubmit: (e:any) => {
                 e.preventDefault()
-                setQueryParams({q: undefined, page: "0"})
+                setQueryParams({q: null, page: 0})
               },
             }} />
             <EXPERIMENTAL_Table.Toolbar.ButtonGroup>
@@ -188,9 +188,9 @@ export const Table = () => {
           </EXPERIMENTAL_Table.Toolbar>
           {!isLoadingState &&
             <EXPERIMENTAL_Table.Pagination {...{
-              onPrevClick: ()=> setQueryParams({page: (queryParams.page - 1).toString()}),
-              onNextClick: ()=> setQueryParams({page: (queryParams.page + 1).toString()}),
-              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value).toString(), page: "0"}),
+              onPrevClick: ()=> setQueryParams({page: queryParams.page - 1}),
+              onNextClick: ()=> setQueryParams({page: queryParams.page + 1}),
+              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 0}),
               tableSize: queryParams.pageSize,
               currentPage: queryParams.page,
               currentItemFrom: queryParams.pageSize * queryParams.page,
