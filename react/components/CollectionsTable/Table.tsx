@@ -10,7 +10,7 @@ import {
   Checkbox, Tooltip, IconInfo, ActionMenu
 } from 'vtex.styleguide'
 
-import { ICollection } from './SelectedActions/actions/useCollections'
+import { ICollection } from '../../context/useCollections'
 import {CloneManyCollections, DeleteManyCollections} from './SelectedActions/actions/tasksCollections'
 import { useTasks } from './Tasks'
 import { columns } from './Columns'
@@ -96,16 +96,14 @@ export const GoToDetalles = (id:number)=>{
 
 export const Table = () => {
   const {
-    collections: {
-      items = [],
-      error: errorCollection,
-      pagination,
-      isLoading,
-      forceUpdate,
-      queryParams,
-      sorting,
-      setQueryParams
-    }
+    items = [],
+    errorCollection,
+    pagination,
+    isLoading,
+    forceUpdate,
+    queryParams,
+    sorting,
+    setQueryParams
   } = useCollectionManager();
 
   const { ModalTasks, BotonTasks } = useTasks();
@@ -121,7 +119,7 @@ export const Table = () => {
     },
   }))
 
-  const measures = EXPERIMENTAL_useTableMeasures({ size: queryParams.pageSize})
+  const measures = EXPERIMENTAL_useTableMeasures({ size: queryParams.pageSize  })
 
   const [withCheckboxes,, checkboxes] = useColumnsWithCheckboxes({
     items: sliceItems,
@@ -146,6 +144,7 @@ export const Table = () => {
             <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
               value: queryParams.q,
               placeholder: 'Buscar...',
+              disabled: isLoading,
               onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
               onClear: () => {
                 setQueryParams({q: null, page: 0})
@@ -162,6 +161,7 @@ export const Table = () => {
                 compactLabel: 'Compact',
                 regularLabel: 'Regular',
                 comfortableLabel: 'Comfortable',
+
               }} />
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Download {...download} /> */}
               <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...{
@@ -183,7 +183,7 @@ export const Table = () => {
               <span className='mr5'>
                 {BotonTasks}
               </span>
-              <StatusFilter/>
+              {!isLoading && <StatusFilter/>}
             </div>
           </EXPERIMENTAL_Table.Toolbar>
           {!isLoadingState &&

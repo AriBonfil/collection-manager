@@ -2,11 +2,8 @@ import React, { useEffect } from "react"
 //@ts-ignore
 import { FilterBar, Input, Dropdown  } from "vtex.styleguide"
 import { useCollectionManager } from "../../../context"
+import { GetType } from "../../../context/useCollections"
 
-export type StatusFilterProps = {
-  // statements: StatusFilterStates["statements"],
-  // setStatements: (statements: StatusFilterStates["statements"])=> void
-}
 export type StatusFilterStates = {
   statements: {
     error: null
@@ -23,15 +20,20 @@ function renderSimpleFilterLabel(statement:any) {
   return "abc";
 }
 
-export const StatusFilter:React.FC<StatusFilterProps> = ()=>{
-  const { searchParams, setSearchParams, collections } = useCollectionManager();
+export type StatusFilterProps = {
+  // statements: StatusFilterStates["statements"],
+  // setStatements: (statements: StatusFilterStates["statements"])=> void
+  disabled?: boolean
+}
+export const StatusFilter:React.FC<StatusFilterProps> = ({disabled})=>{
+  const collections = useCollectionManager();
 
-  const statements:StatusFilterStates["statements"] = Object.keys(searchParams).map(key=>{
-    if(key === "get") {
+  const statements:StatusFilterStates["statements"] = Object.keys(collections.queryParams).map(key=>{
+    if(key === "status") {
       let value = "any";
-      if(searchParams["get"] === "all")  return null;
-      if(searchParams["get"] === "active") value = "active";
-      if(searchParams["get"] === "inactive") value = "inactivo";
+      if(collections.queryParams.status === GetType.ALL)  return null;
+      if(collections.queryParams.status === GetType.ACTIVE) value = "active";
+      if(collections.queryParams.status === GetType.INACTIVE) value = "inactivo";
 
       return {
         error: null,
@@ -45,24 +47,21 @@ export const StatusFilter:React.FC<StatusFilterProps> = ()=>{
 
   return (
     <FilterBar
+      disabled= {disabled}
       alwaysVisibleFilters={['id']}
       statements={statements}
       onChangeStatements={(statements: StatusFilterStates["statements"])=>{
-        var obj:any = {};
+        var obj:any = {page: 0};
         ["id"].map(key=>{
-          var value = undefined;
+          var value = GetType.ALL;
           var v = statements.find(s=> s.subject === key);
           if(v?.subject === "id"){
-            value = "any"
-            if(v?.object === "active") value = "active";
-            if(v?.object === "inactivo") value = "inactive";
-            obj["get"] = value;
+            if(v?.object === "active") value = GetType.ACTIVE;
+            if(v?.object === "inactivo") value = GetType.INACTIVE;
           }
+          obj["status"] = value;
         })
-        setSearchParams(obj);
-        collections.setQueryParams({
-          page: 0
-        });
+        collections.setQueryParams(obj);
       }}
       // clearAllFiltersButtonLabel="Clear Filters"
       options={{

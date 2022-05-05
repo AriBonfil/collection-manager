@@ -1,9 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import { request, useResource } from "react-request-hook";
-import { NumberParam,withDefault, StringParam } from "use-query-params";
+import { NumberParam,withDefault, StringParam, createEnumParam, QueryParamConfig } from "use-query-params";
 import {EXPERIMENTAL_useTableSort} from "vtex.styleguide";
-import { useQueryParamsInVtex } from "../../../../utils/use-query-params";
+import { useQueryParamsInVtex } from "../utils/use-query-params";
 
 export interface CollectionsResponse {
   items:      ICollection[];
@@ -35,34 +35,45 @@ export interface Pagination {
   total:   number;
   pages:   number;
 }
-export type useCollectionsProps = {
-  get?: "active" | "inactive" | "all"
+
+export enum GetType{
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ALL = "all"
 }
 
-export const useCollections = (params:useCollectionsProps={})=>{
-  const [cound2, setCound2] = useState(0);
+export type useCollectionsProps = {
+  get?: GetType
+}
+
+const useFindCollections = ({get}:useCollectionsProps)=>{
+    const [cound, setCound] = useState(0);
+    const [{data, isLoading, error}] = useResource(()=> request<CollectionsResponse>({
+      url: `collections`,
+      method: "GET",
+      params:{
+        get
+      }
+  }),[cound, get] as any);
+
+  return [data, isLoading,error, ()=> setCound(cound+1)] as [typeof data,typeof isLoading,typeof error,()=>void]
+}
+
+export const useCollections = ()=>{
   const [queryParams, setQueryParams] = useQueryParamsInVtex({
     q:  withDefault(StringParam, null),
     page: withDefault(NumberParam, 0),
     pageSize: withDefault(NumberParam, 10),
+    status: withDefault(createEnumParam(["active","inactive","all"]),GetType.ALL) as QueryParamConfig<string | null | undefined, GetType>
   });
   const sorting = EXPERIMENTAL_useTableSort()
 
-  const [{data, isLoading, error}] = useResource(()=> request<CollectionsResponse>({
-      url: `collections`,
-      method: "GET",
-      params:{
-        page: queryParams.page,
-        get: "all",
-        ...params
-      }
-  }),[cound2, params] as any);
-
+  const [collections, isLoading, errorCollection, forceUpdate] = useFindCollections({get: GetType.ALL});
 
   const {items, pagination} = React.useMemo(() => {
-    if(!data?.items) return {};
+    if(!collections?.items) return {};
 
-    var list = data.items;
+    var list = collections.items;
     var fakeTotal;
 
     if(sorting.sorted.by) {
@@ -77,6 +88,12 @@ export const useCollections = (params:useCollectionsProps={})=>{
       });
     }
 
+    if(queryParams.status !== GetType.ALL) {
+      if(queryParams.status === GetType.ACTIVE) list = list.filter(i=> i.active === true);
+      if(queryParams.status === GetType.INACTIVE) list = list.filter(i=> i.active === false);
+      fakeTotal = list.length;
+    }
+
     if(queryParams.q) {
       list = list.filter(i=> i.name.toLowerCase().includes((queryParams as any).q.toLowerCase()));
       fakeTotal = list.length;
@@ -87,27 +104,26 @@ export const useCollections = (params:useCollectionsProps={})=>{
     return {
       items: list,
       pagination: {
-        ...data?.pagination,
+        ...collections?.pagination,
         ...fakeTotal !== undefined?{ total: fakeTotal }:{}
       }
     }
   }, [
     sorting.sorted,
-    data?.items,
+    collections?.items,
+    queryParams.status,
     queryParams.pageSize,
     queryParams.page,
     queryParams.q
   ])
 
   return {
+    errorCollection,
     isLoading,
-    error,
     queryParams,
     sorting,
     setQueryParams,
-    forceUpdate: ()=>{
-      setCound2(cound2+1);
-    },
+    forceUpdate,
     items,
     pagination,
   }

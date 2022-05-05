@@ -1,5 +1,5 @@
 import React from 'react'
-import { ICollection } from '../../CollectionsTable/SelectedActions/actions/useCollections';
+import { ICollection } from '../../../context/useCollections';
 
 const CollectionInfo:React.FC<{data: ICollection } & JSX.IntrinsicElements["div"]> = ({data, ...props}) => {
 
