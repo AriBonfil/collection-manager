@@ -6,6 +6,7 @@
     "lint": "eslint --ext js,jsx,ts,tsx .",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json}\"",
     "lint:locales": "intl-equalizer",
+    "sass-react": "sass --watch --no-source-map react/styles:react --style compressed",
     "test": "cd ./react && yarn test"
   },
   "husky2": {

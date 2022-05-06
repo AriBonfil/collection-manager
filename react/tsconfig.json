@@ -9,11 +9,7 @@
   },
   "include": [
     "./typings/*.d.ts",
-    "./**/*.tsx",
-    "./**/*.ts",
-    "CollectionManagerContext.js",
-    "components/CollectionsTable/index.tsx",
-    "index.jsx",
-    "components/CollectionsTable/SelectedActions/actions/useDeleteCollections.ts"
+    "./src/**/*.tsx",
+    "./src/**/*.ts",
   ]
 }

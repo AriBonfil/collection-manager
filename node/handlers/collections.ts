@@ -1,15 +1,16 @@
 import { ICollectionsResponse, ICollection, IPagination } from '../interfaces';
+import { BlockManager } from './blockCollection';
  const PAGE_SIZE : number = 50
 export async function getCollections(ctx: Context, next: () => Promise<any>) {
-  const {
-    clients: {  collection  },
-    query
-  } = ctx
-
+  const { clients: {  collection  }, query } = ctx
 
   try {
     let res = await collection.getCollections(1, PAGE_SIZE)
-    let inactiveCollections = await collection.getInactiveCollections()
+    // let inactiveCollections = await collection.getInactiveCollections()
+    // temp1.filter(i=> Date.parse(i.dateTo) < (new Date().getTime() + 1000 * 60 * 60 * 24 * 35));
+
+    const persistentList = await BlockManager.Get(ctx).getIndexAll();
+
     let reqIterations = res?.paging?.pages
     let data : ICollectionsResponse = {}
     let arrItems : Array<ICollection> = []
@@ -19,7 +20,10 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
         res.items.forEach((item: any) => {
           arrItems.push({
             ...item,
-            active: isCollectionActive(inactiveCollections, item.id)
+            active: Date.parse(item.dateTo) > new Date().getTime(),
+            // active2: isCollectionActive(inactiveCollections, item.id),
+            // active: Date.parse(item.dateTo) > (new Date().getTime() + 1000 * 60 * 60 * 24 * 35),
+            persistent: persistentList.includes(item.id)
           })
         });
       }
@@ -49,14 +53,14 @@ export async function getCollections(ctx: Context, next: () => Promise<any>) {
 
 }
 
-function isCollectionActive(inactiveCollections: Array<any>, collectionId: String): boolean{
-  let isActive: boolean = false
-  if(inactiveCollections){
-    let matchingCollection = inactiveCollections.find((c: String) => c === collectionId)
-    matchingCollection ? isActive = false : isActive = true
-  }
-    return isActive
-}
+// function isCollectionActive(inactiveCollections: Array<any>, collectionId: String): boolean{
+//   let isActive: boolean = false
+//   if(inactiveCollections){
+//     let matchingCollection = inactiveCollections.find((c: String) => c === collectionId)
+//     matchingCollection ? isActive = false : isActive = true
+//   }
+//     return isActive
+// }
 
 async function filterByActive(data: ICollectionsResponse, query: any){
   // Available filters: active

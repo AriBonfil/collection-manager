@@ -1,13 +1,13 @@
 import React from "react";
-import { GoToDetalles, StopEvent, TableType } from "./Table";
-import { OptionsDots } from '../../resources/icons'
+import { GoToDetalles, StopEvent, TableType } from "../Table";
+import { LockIcon, OptionsDots } from '../../../resources/icons'
 
 import {
   //@ts-ignore
   Checkbox, Tooltip, IconInfo, ActionMenu
 } from 'vtex.styleguide'
-import useDeleteCollections from "./SelectedActions/actions/useDeleteCollections";
-import {CloneManyCollections} from "./SelectedActions/actions/tasksCollections";
+import DeleteCollections from "../utils/DeleteCollections";
+import {CloneManyCollections} from "../utils/TasksCollections";
 
 
 export const columns = [
@@ -18,7 +18,13 @@ export const columns = [
     width: '60.8108%',
     extended: true,
     cellRenderer: ({ data }:{data: TableType}) => {
-      return <div style={data.active?{}:{color: "#979899"}}>{data.name}</div>
+      return <div className="flex" style={data.active?{}:{color: "#979899"}}>{data.persistent && (
+        <Tooltip label="Las colecciones bloqueadas no se eliminan luego de los 35 días de inactividad.">
+          <span className="pointer">
+            <LockIcon className="mr3" size={18}/>
+          </span>
+        </Tooltip>
+      )}{data.name}</div>
     },
   },
   {
@@ -94,7 +100,7 @@ function Actions({ data }:{data: TableType}) {
             label: 'Eliminar',
             isDangerous: true,
             onClick: async () =>{
-              await useDeleteCollections([data.id])
+              await DeleteCollections([data.id])
             }
           },
         ]}

@@ -1,27 +1,28 @@
 import React, { useEffect } from 'react'
 import { useCollectionManager } from '../../context'
-import './Table.css'
+import './styles/styles.css'
 
 import {
   EXPERIMENTAL_Table,
   EXPERIMENTAL_useTableMeasures,
   EXPERIMENTAL_useCheckboxTree,
   //@ts-ignore
-  Checkbox, Tooltip, IconInfo, ActionMenu
+  Checkbox, Tooltip, IconInfo, ActionMenu, Alert
 } from 'vtex.styleguide'
 
 import { ICollection } from '../../context/useCollections'
-import {CloneManyCollections, DeleteManyCollections} from './SelectedActions/actions/tasksCollections'
-import { useTasks } from './Tasks'
-import { columns } from './Columns'
-import { StatusFilter } from './components/status'
+import {BlockManyCollections, CloneManyCollections, DeleteManyCollections} from './utils/TasksCollections'
+import { useTasks } from './components/Tasks'
+import { columns } from './components/Columns'
+import { StatusFilter } from './components/StatusFilter'
 
 export type TableType = {
   id: number,
   name: string,
   total: number,
   type: "Automatic" | "Manual",
-  active: boolean
+  active: boolean,
+  persistent: boolean
 }
 
 
@@ -105,6 +106,7 @@ export const Table = () => {
     pagination,
     isLoading,
     forceUpdate,
+    renderUpdate,
     queryParams,
     sorting,
     setQueryParams
@@ -118,7 +120,8 @@ export const Table = () => {
     name: c.name,
     active: c.active,
     total: c.totalProducts,
-    type: c.type
+    type: c.type,
+    persistent: c.persistent
   }))
 
   const measures = EXPERIMENTAL_useTableMeasures({ size: isLoading? 10 : queryParams.pageSize  })
@@ -131,7 +134,8 @@ export const Table = () => {
       name: c.name,
       active: c.active,
       total: c.totalProducts,
-      type: c.type
+      type: c.type,
+      persistent: c.persistent
     })),
   })
 
@@ -142,6 +146,15 @@ export const Table = () => {
   return  (
     <>
       {ModalTasks}
+      <div className="mb5">
+        <Alert
+          action={{ label: 'Cancelar', onClick: () => console.log('Went back!') }}
+          type="warning"
+          onClose={() => console.log('Closed!')}
+        >
+          Se eliminaran {itemsAll.filter(item=> !item.persistent && Date.parse(item.dateTo) + 1000 * 60 * 60 * 24 * 35 < new Date().getTime()).length} colecciones inactivas en 60s
+        </Alert>
+      </div>
       <EXPERIMENTAL_Table
         loading={isLoadingState}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
@@ -232,7 +245,14 @@ export const Table = () => {
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Bloquear',
                 onClick: () => {
-                  CloneManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                  BlockManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id)).then(ids=>{
+                    ids.forEach((id)=>{
+                      const item = itemsAll.find(i=> i.id === id);
+                      if(!item) return;
+                      item.persistent = true;
+                    });
+                    renderUpdate();
+                  })
                   checkboxes.uncheckAll();
                 },
               }} />

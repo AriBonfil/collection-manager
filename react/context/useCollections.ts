@@ -23,6 +23,7 @@ export interface ICollection {
   type:           Type;
   lastModifiedBy: null;
   active:         boolean;
+  persistent:     boolean
 }
 
 export enum Type {
@@ -60,6 +61,7 @@ const useFindCollections = ({get}:useCollectionsProps)=>{
 }
 
 export const useCollections = ()=>{
+  const [cound, setCound] = useState(0)
   const [queryParams, setQueryParams] = useQueryParamsInVtex({
     q:  withDefault(StringParam, null),
     page: withDefault(NumberParam, 0),
@@ -67,6 +69,7 @@ export const useCollections = ()=>{
     status: withDefault(createEnumParam(["active","inactive","all"]),GetType.ALL) as QueryParamConfig<string | null | undefined, GetType>,
     soft: withDefault(StringParam, null),
   });
+
   const sorting = EXPERIMENTAL_useTableSort(queryParams.soft?JSON.parse(queryParams.soft):undefined)
   useEffect(()=> {
     setQueryParams({page: 0 , soft: JSON.stringify(sorting.sorted)})
@@ -121,6 +124,10 @@ export const useCollections = ()=>{
     queryParams.q
   ])
 
+  useEffect(()=>{
+    // collections?.items.filter(i=> Date.parse(i.dateTo) < (new Date().getTime() + 1000 * 60 * 60 * 24 * 35));
+  },[]);
+
   return {
     errorCollection,
     isLoading,
@@ -128,7 +135,8 @@ export const useCollections = ()=>{
     sorting,
     setQueryParams,
     forceUpdate,
-    itemsAll:collections?.items,
+    renderUpdate: ()=> setCound(cound + 1),
+    itemsAll: collections?.items,
     items,
     pagination,
   }
