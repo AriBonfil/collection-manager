@@ -26,7 +26,7 @@ export type StatusFilterProps = {
   disabled?: boolean
 }
 export const StatusFilter:React.FC<StatusFilterProps> = ({disabled})=>{
-  const collections = useCollectionManager();
+  const {collections} = useCollectionManager();
 
   const statements:StatusFilterStates["statements"] = Object.keys(collections.queryParams).map(key=>{
     if(key === "status") {

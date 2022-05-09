@@ -60,11 +60,33 @@ export async function DeleteManyCollections(arrIds: Array<number>) {
   return response
 }
 
-export async function BlockManyCollections(arrIds: Array<number>) {
+export async function BlockPushManyCollections(arrIds: Array<number>) {
 
   if (arrIds.length > 0) {
      const options:Parameters<typeof fetch>[1] = {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control':'no-store'
+      },
+      body: JSON.stringify({
+        ids: arrIds.map(id=> id)
+      })
+    }
+
+    const {status} = await fetch(`/_v/collections/blocks`, options)
+    if(status !== 200) throw new Error("Algo fallo");
+  }
+
+  return arrIds
+}
+
+export async function BlockDeleteManyCollections(arrIds: Array<number>) {
+
+  if (arrIds.length > 0) {
+     const options:Parameters<typeof fetch>[1] = {
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',

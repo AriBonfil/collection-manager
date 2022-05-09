@@ -4,6 +4,8 @@ import { ICollectionNative, ICollectionsProductItemResponse, ICollectionsProduct
 import FormData from 'form-data'
 import XLSX from "xlsx";
 
+class ErrorInResponse extends Error {}
+
 export default class Collection extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
     super(`http://${context.account}.vtexcommercestable.com.br`,
@@ -62,9 +64,46 @@ export default class Collection extends ExternalClient {
     }
   }
 
+  public async AddProductsInCollectionByFile(id: Number | string, pathFile: string, progreso?: (n:number)=>void ){
+    const workbook = XLSX.readFile(pathFile);
 
-  public async AddProductsInCollection(id: Number, Ids: {sku?: number, product?: number}[]) {
-    const items = Ids.map(({product, sku})=>([sku,product,,]));
+    const ids: Parameters<this["AddProductsInCollection"]>[1] = [];
+
+    for (const sheetName in workbook.Sheets) {
+      const page1 = XLSX.utils.sheet_to_json(workbook.Sheets[ sheetName ]);
+      page1.map((line:any)=>{
+        const obj:Parameters<this["AddProductsInCollection"]>[1][0] = {};
+        for(const key in line){
+          if(key.toLowerCase() === "sku") obj.sku = line[key];
+          if(key.toLowerCase() === "productid") obj.productId = line[key];
+          if(key.toLowerCase() === "skurefid") obj.skuRefId = line[key];
+          if(key.toLowerCase() === "productrefid") obj.productRefId = line[key];
+        }
+        ids.push(obj)
+      })
+    }
+
+    var lastProgress = 0;
+    const pageSize = 499;
+    const pages = Math.ceil(ids.length / pageSize);
+    for (let index = 0; index < pages; index++){
+      await this.AddProductsInCollection(id, ids.slice(index * pageSize, (index + 1) * pageSize));
+      if(progreso){
+        const now = Math.floor(Date.now()/1000);
+        const isSecond = now != lastProgress;
+        lastProgress = now;
+        if(isSecond) await progreso(index/pages);
+      }
+    }
+  }
+
+  public async AddProductsInCollection(id: Number | string, Ids: {
+    sku?: number,
+    productId?: number,
+    skuRefId?: number,
+    productRefId?: number,
+  }[]) {
+    const items = Ids.map(({productId, sku, productRefId, skuRefId})=>([sku||"",productId||"",skuRefId||"",productRefId||""]));
     const data = [
       ["SKU", "PRODUCTID", "SKUREFID", "PRODUCTREFID"],
       ...items
@@ -94,10 +133,13 @@ export default class Collection extends ExternalClient {
           TotalProductsProcessed: number,
           Errors: any[]
         }>(`api/catalog/pvt/collection/${id}/stockkeepingunit/importinsert`, formData, config);
-
-        if(result.TotalProductsProcessed > 0 || items.length === 0) return result;
+        if(result.Errors.length > 0)
+          throw new ErrorInResponse(JSON.stringify(result.Errors, null, 2));
+        if(result.TotalProductsProcessed > 0 || items.length === 0 || result.TotalItemProcessed === items.length) return result;
       } catch (error) {
-        console.error(error);
+        if(error instanceof ErrorInResponse) throw error;
+        if(error.response?.data) console.error(error.response?.data);
+        else console.error(error);
         await new Promise(c=> setTimeout(c,250));
       }
     }
@@ -135,7 +177,7 @@ export default class Collection extends ExternalClient {
           delayProducts.push(...value.items);
         }
       }
-      await this.AddProductsInCollection(newCollecion.Id, delayProducts.map(p=> ({product: p.ProductId, sku: p.SkuId})));
+      await this.AddProductsInCollection(newCollecion.Id, delayProducts.map(p=> ({productId: p.ProductId, sku: p.SkuId})));
       delayProducts = [];
       if(finish) break;
     }

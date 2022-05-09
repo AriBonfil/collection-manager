@@ -8,9 +8,7 @@ export type createTasksType = {
 }
 
 export async function createTasks(ctx: Context) {
-  const {
-    req,
-  } = ctx
+  const { req } = ctx
   const { type, params } = await json(req) as createTasksType;
 
   const tasks = TaskManager.GetTaskManager(ctx as any)

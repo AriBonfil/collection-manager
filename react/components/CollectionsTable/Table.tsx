@@ -11,10 +11,11 @@ import {
 } from 'vtex.styleguide'
 
 import { ICollection } from '../../context/useCollections'
-import {BlockManyCollections, CloneManyCollections, DeleteManyCollections} from './utils/TasksCollections'
+import {BlockPushManyCollections, BlockDeleteManyCollections, CloneManyCollections, DeleteManyCollections} from './utils/TasksCollections'
 import { useTasks } from './components/Tasks'
 import { columns } from './components/Columns'
 import { StatusFilter } from './components/StatusFilter'
+import { AutoDelete } from './components/AutoDelete'
 
 export type TableType = {
   id: number,
@@ -100,16 +101,19 @@ export const GoToDetalles = (id:number)=>{
 
 export const Table = () => {
   const {
-    items = [],
-    itemsAll = [],
-    errorCollection,
-    pagination,
-    isLoading,
-    forceUpdate,
-    renderUpdate,
-    queryParams,
-    sorting,
-    setQueryParams
+    collections: {
+      items = [],
+      itemsAll = [],
+      errorCollection,
+      pagination,
+      isLoading,
+      forceUpdate,
+      renderUpdate,
+      queryParams,
+      sorting,
+      setQueryParams
+    },
+    modalImport
   } = useCollectionManager();
 
   const { ModalTasks, BotonTasks } = useTasks();
@@ -143,17 +147,14 @@ export const Table = () => {
 
   const isLoadingState = isLoading || errorCollection;
 
+  const isCheck = checkboxes.checkedItems.length > 0? checkboxes.checkedItems.every((i:any)=> i.persistent): false;
+
   return  (
     <>
       {ModalTasks}
+      {modalImport.Modal}
       <div className="mb5">
-        <Alert
-          action={{ label: 'Cancelar', onClick: () => console.log('Went back!') }}
-          type="warning"
-          onClose={() => console.log('Closed!')}
-        >
-          Se eliminaran {itemsAll.filter(item=> !item.persistent && Date.parse(item.dateTo) + 1000 * 60 * 60 * 24 * 35 < new Date().getTime()).length} colecciones inactivas en 60s
-        </Alert>
+        <AutoDelete/>
       </div>
       <EXPERIMENTAL_Table
         loading={isLoadingState}
@@ -243,34 +244,31 @@ export const Table = () => {
                 },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
-                label: 'Bloquear',
+                label: isCheck?'Desbloquear':'Bloquear',
                 onClick: () => {
-                  BlockManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id)).then(ids=>{
-                    ids.forEach((id)=>{
-                      const item = itemsAll.find(i=> i.id === id);
-                      if(!item) return;
-                      item.persistent = true;
-                    });
-                    renderUpdate();
-                  })
+                  if(isCheck){
+                    BlockDeleteManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id)).then(ids=>{
+                      ids.forEach((id)=>{
+                        const item = itemsAll.find(i=> i.id === id);
+                        if(!item) return;
+                        item.persistent = false;
+                      });
+                      renderUpdate();
+                    })
+                  }
+                  else{
+                    BlockPushManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id)).then(ids=>{
+                      ids.forEach((id)=>{
+                        const item = itemsAll.find(i=> i.id === id);
+                        if(!item) return;
+                        item.persistent = true;
+                      });
+                      renderUpdate();
+                    })
+                  }
                   checkboxes.uncheckAll();
                 },
               }} />
-              {/* <EXPERIMENTAL_Table.Bulk.Actions.Secondary {...{
-                label: 'Quantity',
-                actions: [
-                  {
-                    label: 'Increase 50',
-                    onClick: () => alert("A"),
-                  },
-                  {
-                    label: 'Decrease 50',
-                    onClick: () => alert("A"),
-                    isDangerous: true
-                  },
-                ],
-                onActionClick: (action:any) => action.onClick((checkboxes as any).checkedItems),
-              }} /> */}
             </EXPERIMENTAL_Table.Bulk.Actions>
             <EXPERIMENTAL_Table.Bulk.Tail>
               {!(checkboxes as any).allChecked && (

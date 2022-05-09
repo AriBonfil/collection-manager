@@ -3,6 +3,7 @@
     "@types/randomstring": "^1.1.8",
     "co-body": "^6.0.0",
     "form-data": "^4.0.0",
+    "formidable": "^2.0.1",
     "randomstring": "^1.2.2",
     "react-apollo": "^3.1.5",
     "xlsx": "^0.18.5"

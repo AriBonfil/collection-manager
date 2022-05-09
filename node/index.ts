@@ -8,6 +8,7 @@ import { cloneCollection } from './handlers/cloneCollection'
 import { tasks } from './handlers/tasks';
 import { createTasks } from './handlers/createTasks';
 import { getBlockCollection, removeBlockCollection, setBlockCollection } from './handlers/blockCollection';
+import { importProducts, readBody } from './handlers/importProducts';
 declare global {
   // We declare a global Context type just to avoid re-writing ServiceContext<Clients, State> in every handler and resolver
   type Context = ServiceContext<Clients, State>
@@ -45,6 +46,9 @@ export default new Service({
 		}),
     collectionsDetail: method({
 			GET: [getCollection],
+		}),
+    collectionsImport: method({
+			POST: [readBody,importProducts],
 		}),
     deleteCollection: method({
       POST: [deleteCollection],

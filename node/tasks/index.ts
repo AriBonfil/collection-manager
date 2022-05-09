@@ -2,10 +2,12 @@ import randomstring from "randomstring";
 import { ActionBase } from "./TaskBase";
 import { TaskClone } from "./TaskClone";
 import { TaskDelete } from "./TaskDelete";
+import { TaskImport } from "./TaskImport";
 
 export enum TaskNames {
   CLONE="clone",
-  DELETE="delete"
+  DELETE="delete",
+  IMPORT="import"
 }
 
 export enum ActionState {
@@ -80,6 +82,7 @@ export class TaskManager{
     switch (action.task) {
       case TaskNames.CLONE: return new TaskClone(this, action as any)
       case TaskNames.DELETE: return new TaskDelete(this, action as any)
+      case TaskNames.IMPORT: return new TaskImport(this, action as any)
       default: throw new Error("Action no valida");
     }
   }

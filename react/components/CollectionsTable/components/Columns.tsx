@@ -8,6 +8,7 @@ import {
 } from 'vtex.styleguide'
 import DeleteCollections from "../utils/DeleteCollections";
 import {CloneManyCollections} from "../utils/TasksCollections";
+import { useCollectionManager } from "../../../context";
 
 
 export const columns = [
@@ -78,6 +79,8 @@ export const columns = [
 ]
 
 function Actions({ data }:{data: TableType}) {
+  const { modalImport } = useCollectionManager();
+
   return (
     <StopEvent>
       <ActionMenu
@@ -89,6 +92,12 @@ function Actions({ data }:{data: TableType}) {
           {
             label: 'Detalles',
             onClick: () => GoToDetalles(data.id)
+          },
+          {
+            label: 'Importar',
+            onClick: () => {
+              modalImport.setCollection(data)
+            }
           },
           {
             label: 'Clonar',

@@ -21,6 +21,10 @@
 			"path": "/_v/collections/:id",
 			"public": true
 		},
+    "collectionsImport": {
+			"path": "/_v/collections/import/:id",
+			"public": true
+		},
     "deleteCollection": {
       "path": "/_v/collections/delete/:id",
       "public": true

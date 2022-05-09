@@ -6,10 +6,5 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es2017"
-  },
-  "include": [
-    "./typings/*.d.ts",
-    "./src/**/*.tsx",
-    "./src/**/*.ts",
-  ]
+  }
 }
