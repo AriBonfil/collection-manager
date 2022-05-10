@@ -1,11 +1,11 @@
 import React from 'react'
 import CollectionDetail from './components/CollectionsDetail'
-import { ProviderSearchParameters } from './utils/searchParameters';
+import { QueryParamProvider } from 'use-query-params';
 
 export default ({params}:{params:any}) => {
   return (
-    <ProviderSearchParameters >
+    <QueryParamProvider >
       <CollectionDetail id={params.id}/>
-    </ProviderSearchParameters>
+    </QueryParamProvider>
   );
 }

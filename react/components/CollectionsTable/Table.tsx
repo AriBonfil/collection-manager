@@ -190,10 +190,10 @@ export const Table = () => {
 
               }} />
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Download {...download} /> */}
-              <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...{
+              {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Upload {...{
                 label: 'Import',
                 onClick: () => alert('Clicked IMPORT'),
-              }} />
+              }} /> */}
               <EXPERIMENTAL_Table.Toolbar.ButtonGroup.ExtraActions {...{
                 label: 'Mas opciones',
                 actions: [

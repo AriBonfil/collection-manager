@@ -1,7 +1,7 @@
 import React from 'react'
 import { useProductsByCollection } from '..';
 
-import { useQueryParams, NumberParam,withDefault } from "use-query-params";
+import { NumberParam, withDefault } from "use-query-params";
 
 import {
   EXPERIMENTAL_Table,
@@ -9,6 +9,7 @@ import {
   //@ts-ignore
   Checkbox, Tooltip, IconInfo, ActionMenu
 } from 'vtex.styleguide'
+import { useQueryParamsInVtex } from '../../../utils/use-query-params';
 
 
 export const columns = [
@@ -42,7 +43,7 @@ export const columns = [
 
 const CollectionProducts:React.FC<{id: number | string}> = ({id}) => {
 
-  const [, setQueryParams] = useQueryParams({
+  const [, setQueryParams] = useQueryParamsInVtex({
     page: withDefault(NumberParam, 1),
     pageSize: withDefault(NumberParam, 50),
   });
@@ -113,19 +114,21 @@ const CollectionProducts:React.FC<{id: number | string}> = ({id}) => {
               <StatusFilter/>
             </div> */}
           </EXPERIMENTAL_Table.Toolbar>
-          <EXPERIMENTAL_Table.Pagination {...{
-            onPrevClick: ()=> setQueryParams({page: paging.page - 1},"pushIn"),
-            onNextClick: ()=> setQueryParams({page: paging.page + 1},"pushIn"),
-            onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 0}),
-            tableSize: paging.perPage,
-            currentPage: paging.page,
-            currentItemFrom: paging.perPage * paging.page,
-            currentItemTo: paging.perPage * (paging.page + 1),
-            textOf: 'de',
-            rowsOptions: [10, 15,25,50],
-            textShowRows: 'Colecciones mostradas',
-            totalItems:  paging.total,
-          }}/>
+          {paging &&
+            <EXPERIMENTAL_Table.Pagination {...{
+              onPrevClick: ()=> setQueryParams({page: paging.page - 1},"pushIn"),
+              onNextClick: ()=> setQueryParams({page: paging.page + 1},"pushIn"),
+              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 0}),
+              tableSize: paging.perPage,
+              currentPage: paging.page,
+              currentItemFrom: paging.perPage * paging.page,
+              currentItemTo: paging.perPage * (paging.page + 1),
+              textOf: 'de',
+              rowsOptions: [10, 15,25,50],
+              textShowRows: 'Colecciones mostradas',
+              totalItems:  paging.total,
+            }}/>
+          }
           {/* <EXPERIMENTAL_Table.Bulk active={(checkboxes as any).someChecked}>
             <EXPERIMENTAL_Table.Bulk.Actions>
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
