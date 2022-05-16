@@ -1,7 +1,7 @@
 {
   "vendor": "arcencohogarqa",
   "name": "collection-manager",
-  "version": "0.0.1-0",
+  "version": "0.0.1",
   "title": "collection-manager",
   "description": "collection-manager",
   "builders": {
@@ -20,6 +20,10 @@
   "registries": [
     "smartcheckout"
   ],
+  "supportWorkspaces": true,
+  "billingOptions": {
+    "free": true
+  },
   "policies": [
     {
       "name": "outbound-access",
