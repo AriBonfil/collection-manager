@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useProductsByCollection } from '..';
+import cn from "classnames"
 
-import { NumberParam, withDefault } from "use-query-params";
+import { NumberParam, StringParam, withDefault } from "use-query-params";
 
 import {
   EXPERIMENTAL_Table,
   EXPERIMENTAL_useTableMeasures,
   //@ts-ignore
-  Checkbox, Tooltip, IconInfo, ActionMenu
+  Checkbox, Tooltip, IconInfo, ActionMenu, Button
 } from 'vtex.styleguide'
 import { useQueryParamsInVtex } from '../../../utils/use-query-params';
 
@@ -15,10 +16,11 @@ import { useQueryParamsInVtex } from '../../../utils/use-query-params';
 export const columns = [
   {
     id: 'imageUrl',
-    title: <div className="tr ws-normal">Imagen</div>,
+    title: <div className="tc ws-normal">Imagen</div>,
     width: '12.1622%',
     cellRenderer: ({ data }:{data: string}) =>
-    <img title='Imagen de Producto' style={{width: '50px'}} src={data}></img>,
+    <div className="tc"><img title='' style={{width: '50px'}} src={data}></img></div>
+    ,
   },
   {
     id: 'name',
@@ -27,62 +29,82 @@ export const columns = [
   },
   {
     id: 'id',
-    sortable: true,
-    title: <div className="tr ws-normal">ID</div>,
+    title: <div className="tc ws-normal">ID</div>,
     width: '10.1351%',
     cellRenderer: ({ data }:{data: string}) => <div className="tc">{data}</div>,
   },
   {
     id: 'ref',
-    sortable: true,
     title: <div className="tr ws-normal">RefID</div>,
     width: '10.1351%',
     cellRenderer: ({ data }:{data: string}) => <div className="tc">{data}</div>,
   },
 ]
 
-const CollectionProducts:React.FC<{id: number | string}> = ({id}) => {
+const CollectionProducts:React.FC<{id: number | string} & React.HTMLAttributes<HTMLDivElement>> = ({id, className, ...props}) => {
 
-  const [, setQueryParams] = useQueryParamsInVtex({
+  const [queryParams, setQueryParams] = useQueryParamsInVtex({
     page: withDefault(NumberParam, 1),
-    pageSize: withDefault(NumberParam, 50),
+    pageSize: withDefault(NumberParam, 15),
+    term: withDefault(StringParam, undefined),
   });
 
-  const [data, loading] = useProductsByCollection(id, {
-    page: 0,
-    pageSize: 50
+  const [data, loading, error, forceUpdate] = useProductsByCollection(id, {
+    page: queryParams.page ,
+    pageSize: queryParams.pageSize,
+    term: queryParams.term
   });
   const {items = [], paging} = data || {};
 
-  const measures = EXPERIMENTAL_useTableMeasures({ size: items.length +1})
+  const measures = EXPERIMENTAL_useTableMeasures({ size: items.length})
 
-  if(loading) return null;
+  useEffect(()=>{
+    //@ts-ignore
+    measures.setDensity("comfortable")
+  },[])
 
   return (
-    <div>
-
+    <div className={cn(className)} {...props}>
       <EXPERIMENTAL_Table
+        empty={(!loading && data?.paging?.total === 0) || error}
         loading={loading}
         // onRowClick={({ rowData }:{rowData: TableType}) =>{
         //   if(Date.now() - omitClick1 < 100 ) return;
         //   GoToDetalles(rowData.id);
         // }}
         items={items}
+        emptyState={error?{
+          label: 'Ocurrio un error',
+          children: (
+            <React.Fragment>
+              <p>
+
+              </p>
+              <div className="pt5">
+                <Button variation="secondary" size="small" onClick={()=> forceUpdate()}>
+                  <span className="flex align-baseline">Reintentar</span>
+                </Button>
+              </div>
+            </React.Fragment>
+          ),
+        }:{
+          label: 'No hay resultados'
+        }}
         columns={columns}
         measures={measures}>
           <EXPERIMENTAL_Table.Toolbar>
-            {/* <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
-              value: queryParams.q,
+            <EXPERIMENTAL_Table.Toolbar.InputSearch {...{
+              value: queryParams.term,
               placeholder: 'Buscar...',
-              onChange: (e:any) => setQueryParams({q: e.currentTarget.value, page: 0 }),
+              onChange: (e:any) => setQueryParams({term: e.currentTarget.value, page: 1 }),
               onClear: () => {
-                setQueryParams({q: null, page: 0})
+                setQueryParams({term: "", page: 1 })
               },
               onSubmit: (e:any) => {
                 e.preventDefault()
-                setQueryParams({q: null, page: 0})
+                setQueryParams({term: e.currentTarget.value, page: 1 })
               },
-            }} /> */}
+            }} />
             {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup> */}
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Columns {...buttonColumns} /> */}
               {/* <EXPERIMENTAL_Table.Toolbar.ButtonGroup.Density {...{
@@ -118,15 +140,16 @@ const CollectionProducts:React.FC<{id: number | string}> = ({id}) => {
             <EXPERIMENTAL_Table.Pagination {...{
               onPrevClick: ()=> setQueryParams({page: paging.page - 1},"pushIn"),
               onNextClick: ()=> setQueryParams({page: paging.page + 1},"pushIn"),
-              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 0}),
+              onRowsChange: (_:any, value:string)=> setQueryParams({pageSize: parseInt(value), page: 1}),
               tableSize: paging.perPage,
               currentPage: paging.page,
-              currentItemFrom: paging.perPage * paging.page,
-              currentItemTo: paging.perPage * (paging.page + 1),
+              currentItemFrom: paging.perPage * (paging.page-1),
+              currentItemTo: paging.perPage * (paging.page),
               textOf: 'de',
               rowsOptions: [10, 15,25,50],
               textShowRows: 'Colecciones mostradas',
               totalItems:  paging.total,
+              selectedOption: paging.perPage
             }}/>
           }
           {/* <EXPERIMENTAL_Table.Bulk active={(checkboxes as any).someChecked}>

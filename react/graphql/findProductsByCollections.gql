@@ -1,10 +1,11 @@
-query($collectionId: ID!, $page: Int!, $pageSize: Int!) {
+query($collectionId: ID!, $page: Int!, $pageSize: Int!, $term: String = "") {
   products(
     collectionId: $collectionId
     page: $page
     pageSize: $pageSize
-    term: ""
-  ) {
+    term: $term
+    filters: { collectionSkuId: $collectionId }
+  ) @context(provider: "vtex.products-graphql") {
     items {
       id
       name

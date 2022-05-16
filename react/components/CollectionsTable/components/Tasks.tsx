@@ -67,9 +67,12 @@ const BuildText = (action: ActionBase)=>{
   return "Desconocido";
 }
 
-const useTasksToast = (tasks:ActionBase[])=>{
-  const [last, setLast] = useState<number | string>(0);
-  const ref = useRef<any>({});
+const useTasksToast = (tasks:ActionBase[],{setOpen}:{
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+})=>{
+  const [last, setLast] = useState<number | string>(Date.now());
+  const ref = useRef<any>({} as any);
+  ref.current.setOpen = setOpen;
 
   useEffect(()=>{
     if(!tasks || tasks.length < 1) return;
@@ -78,12 +81,11 @@ const useTasksToast = (tasks:ActionBase[])=>{
     list.forEach((t)=>{
       ref.current?.showToast({
         message: `Se completo la tarea "${BuildText(t)}"`,
-        duration: 1000,
-        // action: {
-        //   label: 'See cart',
-        //   href: 'http://vtex.com',
-        //   target: '_blank'
-        // }
+        duration: 4000,
+        action: {
+          label: 'Ir a tareas',
+          onClick: ()=> ref.current?.setOpen(true)
+        }
       });
     });
     setLast(tasks[0].createAt);
@@ -181,7 +183,7 @@ export const useTasks = ()=>{
   const [isOpen, setOpen] = useState(false);
   const {tasks} = useSyncTasks();
 
-  const {Toast} = useTasksToast(tasks);
+  const {Toast} = useTasksToast(tasks, {setOpen});
 
   return {
       BotonTasks: <BotonTasks onClick={()=> setOpen(true)} tasks={tasks}/>,

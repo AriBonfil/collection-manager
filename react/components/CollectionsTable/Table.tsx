@@ -7,7 +7,7 @@ import {
   EXPERIMENTAL_useTableMeasures,
   EXPERIMENTAL_useCheckboxTree,
   //@ts-ignore
-  Checkbox, Tooltip, IconInfo, ActionMenu, Alert
+  Checkbox, Tooltip, IconInfo, ActionMenu, Alert, Button
 } from 'vtex.styleguide'
 
 import { ICollection } from '../../context/useCollections'
@@ -96,7 +96,28 @@ function useColumnsWithCheckboxes({ items, itemsAll }:{items:TableType[], itemsA
 }
 
 export const GoToDetalles = (id:number)=>{
-  location.href = `collection-manager/detail/${id}`
+  location.href = `//${location.host}/admin/app/collection-manager/detail/${id}`
+}
+
+export const GoToMain = ()=>{
+  location.href = `//${location.host}/admin/app/collection-manager/`
+}
+
+const customEmptyState = {
+  label: 'This is a default empty state for title',
+  children: (
+    <React.Fragment>
+      <p>
+        A longer explanation of what should be here, and why should I care
+        about what should be here.
+      </p>
+      <div className="pt5">
+        <Button variation="secondary" size="small">
+          <span className="flex align-baseline">Suggested action</span>
+        </Button>
+      </div>
+    </React.Fragment>
+  ),
 }
 
 export const Table = () => {
@@ -113,7 +134,8 @@ export const Table = () => {
       sorting,
       setQueryParams
     },
-    modalImport
+    modalImport,
+    modalConfirm
   } = useCollectionManager();
 
   const { ModalTasks, BotonTasks } = useTasks();
@@ -152,6 +174,7 @@ export const Table = () => {
   return  (
     <>
       {ModalTasks}
+      {modalConfirm.Modal}
       {modalImport.Modal}
       <div className="mb5">
         <AutoDelete/>
@@ -160,9 +183,10 @@ export const Table = () => {
         loading={isLoadingState}
         onRowClick={({ rowData }:{rowData: TableType}) =>{
           if(Date.now() - omitClick1 < 100 ) return;
-          GoToDetalles(rowData.id);
+          if(checkboxes.checkedItems.length === 0) GoToDetalles(rowData.id);
         }}
         sorting={sorting}
+        emptyState={customEmptyState}
         items={sliceItems}
         columns={withCheckboxes}
         measures={measures}>
@@ -225,6 +249,7 @@ export const Table = () => {
               rowsOptions: [10, 15,25,50],
               textShowRows: 'Colecciones mostradas',
               totalItems:  pagination?.total,
+              selectedOption: queryParams.pageSize
             }}/>
           }
           <EXPERIMENTAL_Table.Bulk active={(checkboxes as any).someChecked}>
@@ -232,8 +257,14 @@ export const Table = () => {
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{
                 label: 'Eliminar',
                 onClick: () => {
-                  DeleteManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
-                  checkboxes.uncheckAll();
+                  modalConfirm.setAction({
+                    run: async ()=>{
+                      DeleteManyCollections((checkboxes as {checkedItems: TableType[]}).checkedItems.filter(i=> Number.isInteger(i.id)).map(i=> i.id));
+                      checkboxes.uncheckAll();
+                      return true
+                    },
+                    list: checkboxes.checkedItems as any
+                  });
                 },
               }} />
               <EXPERIMENTAL_Table.Bulk.Actions.Primary {...{

@@ -6,16 +6,22 @@ const CollectionInfo:React.FC<{data: ICollection } & JSX.IntrinsicElements["div"
   if(!data) return null;
 
   return (
-    <div {...props}>
-      <p>Product name: {data.name}</p>
-      <p>Product id: {data.id}</p>
-      <p>Searchable {data.searchable ? 'Si' : 'No' }</p>
-      <p>Highlight {data.highlight ? 'Si' : 'No' }</p>
-      <p>Date From {data.dateFrom}</p>
-      <p>Date To {data.dateTo}</p>
-      <p>Total Products: {data.totalProducts}</p>
-      <p>Type: {data.type}</p>
-      <p>Description: {data.description}</p>
+    <div {...props} className="ph5">
+      <div className='flex'>
+        <div className='w-50'>
+          <p>Nombre: <span className='b'>{data.name}</span></p>
+          <p>ID: <span className='b'>{data.id}</span></p>
+          <p>Highlight <span className='b'>{data.highlight ? 'Si' : 'No' }</span></p>
+          <p>Searchable <span className='b'>{data.searchable ? 'Si' : 'No' }</span></p>
+        </div>
+        <div className='w-50'>
+          <p>Tipo: <span className='b'>{data.type}</span></p>
+          <p>Date From: <span className='b'>{new Date(data.dateFrom).toLocaleString()}</span></p>
+          <p>Date To: <span className='b'>{new Date(data.dateTo).toLocaleString()}</span></p>
+          <p>Total de productos: <span className='b'>{data.totalProducts}</span></p>
+        </div>
+      </div>
+      {data.description && <p>Descripción: <span className='b'>{data.description}</span></p>}
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import React from 'react'
-import { useQuery } from 'react-apollo'
+import React, { useEffect } from 'react'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import CollectionInfo from './components/CollectionInfo'
 
 //@ts-ignore
@@ -13,6 +13,7 @@ import {
   PageBlock, Layout, PageHeader
 } from 'vtex.styleguide'
 import CollectionProducts from './components/CollectionProducts'
+import { GoToMain } from '../CollectionsTable/Table'
 
 const useCollection = (id:string)=>{
   const {data,loading, error} = useQuery(GET_COLLECTION, {
@@ -39,16 +40,22 @@ type ProductType = {
   detailUrl: string
 }
 export const useProductsByCollection = (id:string | number, {
-  page, pageSize
+  page, pageSize, term
 }:{
   page:number,
-  pageSize: number
+  pageSize: number,
+  term?: string
 })=>{
-  const {data,loading, error} = useQuery<{products: ProductsRespongse}>(FIND_PRODUCTS_BY_COLLECTIONS, {
-    variables:{ collectionId: id, page,pageSize }
+  const [resquest,{data,loading, error}] = useLazyQuery<{products: ProductsRespongse}>(FIND_PRODUCTS_BY_COLLECTIONS, {
+    variables:{ collectionId: id+"", page,pageSize, term }
   });
 
-  return [data?.products, loading, error] as [ProductsRespongse, typeof loading, typeof error]
+  useEffect(()=>{
+    if(!id) return;
+    resquest();
+  },[id, page, pageSize, term]);
+
+  return [data?.products, loading, error, resquest] as [ProductsRespongse, typeof loading, typeof error, typeof resquest]
 }
 
 const index: React.FC<{id: string}> = ({id}) => {
@@ -59,10 +66,11 @@ const index: React.FC<{id: string}> = ({id}) => {
   return (
     <Layout pageHeader={<PageHeader title={collection?.name}
         linkLabel="Volver"
+        onLinkClick={GoToMain}
       />}>
       <PageBlock>
         <CollectionInfo data={collection}/>
-        <CollectionProducts id={id}/>
+        <CollectionProducts className='mt6' id={id}/>
       </PageBlock>
     </Layout>
   )

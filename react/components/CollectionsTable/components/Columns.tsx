@@ -31,9 +31,9 @@ export const columns = [
   {
     id: 'products',
     sortable: true,
-    title: <div className="tr ws-normal">Productos</div>,
-    width: '10.1351%',
-    minWidth: '10.1351%',
+    title: <span className="tr ws-normal">Productos</span>,
+    width: '12.1351%',
+    minWidth: '12.1351%',
     extended: true,
     cellRenderer: ({ data }:{data: TableType}) => <div className="tr" style={data.active?{}:{color: "#979899"}}>{data.type==="Manual"?data.total:
     <div className="flex relative items-center justify-end">
@@ -48,7 +48,7 @@ export const columns = [
   {
     id: 'id',
     sortable: true,
-    title: <div className="tr ws-normal">ID</div>,
+    title: <span className="tr ws-normal">ID</span>,
     width: '10.1351%',
     extended: true,
     cellRenderer: ({ data }:{data: TableType}) => {
@@ -58,7 +58,7 @@ export const columns = [
   {
     id: 'active',
     sortable: true,
-    title: <div className="tr ws-normal">Estatus</div>,
+    title: <span className="tr ws-normal">Estatus</span>,
     width: '12.1622%',
     extended: true,
     cellRenderer: ({ data }:{data: TableType}) => <div className="flex flex-row justify-end pl2">
@@ -79,7 +79,7 @@ export const columns = [
 ]
 
 function Actions({ data }:{data: TableType}) {
-  const { modalImport } = useCollectionManager();
+  const { modalImport, modalConfirm } = useCollectionManager();
 
   return (
     <StopEvent>
@@ -109,7 +109,14 @@ function Actions({ data }:{data: TableType}) {
             label: 'Eliminar',
             isDangerous: true,
             onClick: async () =>{
-              await DeleteCollections([data.id])
+
+              modalConfirm.setAction({
+                run: async ()=>{
+                  await DeleteCollections([data.id])
+                  return true
+                },
+                list: [data]
+              });
             }
           },
         ]}
